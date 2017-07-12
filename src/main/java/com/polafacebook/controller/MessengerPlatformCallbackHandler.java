@@ -41,14 +41,6 @@ public class MessengerPlatformCallbackHandler {
     private final MessengerReceiveClient receiveClient;
     private final MessengerSendClient sendClient;
 
-    /**
-     * Constructs the {@code MessengerPlatformCallbackHandler} and initializes the {@code MessengerReceiveClient}.
-     *
-     * @param appSecret   the {@code Application Secret}
-     * @param verifyToken the {@code Verification Token} that has been provided by you during the setup of the {@code
-     *                    Webhook}
-     * @param sendClient  the initialized {@code MessengerSendClient}
-     */
     @Autowired
     public MessengerPlatformCallbackHandler(@Value("${messenger4j.appSecret}") final String appSecret,
                                             @Value("${messenger4j.verifyToken}") final String verifyToken,
@@ -70,12 +62,6 @@ public class MessengerPlatformCallbackHandler {
         this.sendClient = sendClient;
     }
 
-    /**
-     * Webhook verification endpoint.
-     * <p>
-     * The passed verification token (as query parameter) must match the configured verification token.
-     * In case this is true, the passed challenge string must be returned by this endpoint.
-     */
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<String> verifyWebhook(@RequestParam(MODE_REQUEST_PARAM_NAME) final String mode,
                                                 @RequestParam(VERIFY_TOKEN_REQUEST_PARAM_NAME) final String verifyToken,
@@ -91,9 +77,6 @@ public class MessengerPlatformCallbackHandler {
         }
     }
 
-    /**
-     * Callback endpoint responsible for processing the inbound messages and events.
-     */
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Void> handleCallback(@RequestBody final String payload,
                                                @RequestHeader(SIGNATURE_HEADER_NAME) final String signature) {
@@ -170,12 +153,6 @@ public class MessengerPlatformCallbackHandler {
                     case "typing off":
                         sendTypingOff(senderId);
                         break;
-
-                    /*
-                    case "account linking":
-                        sendAccountLinking(senderId);
-                        break;
-                    */
 
                     default:
                         sendTextMessage(senderId, messageText);
@@ -424,9 +401,7 @@ public class MessengerPlatformCallbackHandler {
             final String senderId = event.getSender().getId();
 
             if (messageIds != null) {
-                messageIds.forEach(messageId -> {
-                    logger.info("Received delivery confirmation for message '{}'", messageId);
-                });
+                messageIds.forEach(messageId -> logger.info("Received delivery confirmation for message '{}'", messageId));
             }
 
             logger.info("All messages before '{}' were delivered to user '{}'", watermark, senderId);
@@ -444,11 +419,6 @@ public class MessengerPlatformCallbackHandler {
         };
     }
 
-    /**
-     * This handler is called when either the message is unsupported or when the event handler for the actual event type
-     * is not registered. In this showcase all event handlers are registered. Hence only in case of an
-     * unsupported message the fallback event handler is called.
-     */
     private FallbackEventHandler newFallbackEventHandler() {
         return event -> {
             logger.debug("Received FallbackEvent: {}", event);
