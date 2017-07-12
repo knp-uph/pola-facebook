@@ -39,6 +39,12 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>com.github.messenger4j</groupId>
+			<artifactId>messenger4j</artifactId>
+			<version>0.8.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
