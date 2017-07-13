@@ -13,6 +13,7 @@ import com.github.messenger4j.send.buttons.Button;
 import com.github.messenger4j.send.templates.ButtonTemplate;
 import com.github.messenger4j.send.templates.GenericTemplate;
 import com.github.messenger4j.send.templates.ReceiptTemplate;
+import com.polafacebook.service.BarCodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Date;
 import java.util.List;
 
@@ -40,6 +44,9 @@ public class MessengerPlatformCallbackHandler {
 
     private final MessengerReceiveClient receiveClient;
     private final MessengerSendClient sendClient;
+
+    @Autowired
+    private BarCodeService barCodeService;
 
     @Autowired
     public MessengerPlatformCallbackHandler(@Value("${messenger4j.appSecret}") final String appSecret,
@@ -308,15 +315,29 @@ public class MessengerPlatformCallbackHandler {
                 if (payload.isBinaryPayload()) {
                     payloadAsString = payload.asBinaryPayload().getUrl();
                 }
+
                 if (payload.isLocationPayload()) {
                     payloadAsString = payload.asLocationPayload().getCoordinates().toString();
                 }
 
+                if (attachmentType == AttachmentMessageEvent.AttachmentType.IMAGE) {
+                    try {
+                        if (payloadAsString != null) {
+                            String result = barCodeService.processBarCode(new URL(payloadAsString));
+                            sendTextMessage(senderId, result != null ? result : "Błąd przetwarzania zdjęcia z kodem kreskowym");
+                        } else {
+                            sendBarCodeErrorMessage(senderId);
+                        }
+                    } catch (MalformedURLException e) {sendBarCodeErrorMessage(senderId);}
+                }
+
                 logger.info("Attachment of type '{}' with payload '{}'", attachmentType, payloadAsString);
             });
-
-            sendTextMessage(senderId, "Message with attachment received");
         };
+    }
+
+    private void sendBarCodeErrorMessage(String senderId) {
+        sendTextMessage(senderId, "Błąd przetwarzania zdjęcia z kodem kreskowym");
     }
 
     private QuickReplyMessageEventHandler newQuickReplyMessageEventHandler() {
