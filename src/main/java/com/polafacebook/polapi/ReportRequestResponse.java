@@ -2,17 +2,19 @@ package com.polafacebook.polapi;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by Piotr on 12.07.2017.
  */
 public class ReportRequestResponse {
-    private int id;
     @SerializedName("signed_requests")
-    private String[] signedRequests;
+    private String[][] signedRequests;
+    private int id;
 
-    public ReportRequestResponse(int id, String[] signedRequests) {
+    public ReportRequestResponse(String[][] signedRequests, int id) {
         this.id = id;
         this.signedRequests = signedRequests;
     }
@@ -29,10 +31,14 @@ public class ReportRequestResponse {
     }
 
     public String[] getSignedRequests() {
-        return signedRequests;
+        List<String> flatArray = new ArrayList<>();
+        for (String[] array : signedRequests) {
+            flatArray.addAll(Arrays.asList(array));
+        }
+        return flatArray.toArray(new String [flatArray.size()]);
     }
 
-    public void setSignedRequests(String[] signedRequests) {
+    public void setSignedRequests(String[][] signedRequests) {
         this.signedRequests = signedRequests;
     }
 
@@ -40,7 +46,7 @@ public class ReportRequestResponse {
     public String toString() {
         return "ReportRequestResponse{" +
                 "id=" + id +
-                ", signedRequests=" + Arrays.toString(signedRequests) +
+                ", signedRequests=" + Arrays.toString(this.getSignedRequests()) +
                 '}';
     }
 }
