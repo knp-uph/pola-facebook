@@ -1,16 +1,17 @@
 package com.polafacebook.polapi;
 
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.*;
-
+import com.google.gson.Gson;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.google.gson.Gson;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Piotr on 09.07.2017.
@@ -41,10 +42,11 @@ public class Pola {
                 .queryParam("code", code)
                 .queryParam("device_id", deviceId).build().toUriString());
         HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
-        final int responseCode = httpConn.getResponseCode();
+
         BufferedReader r = new BufferedReader(new InputStreamReader(httpConn.getInputStream()));
         StringBuilder json = new StringBuilder();
         String line;
+
         while ((line = r.readLine()) != null) {
             json.append(line);
         }
@@ -53,7 +55,7 @@ public class Pola {
     }
 
     /**
-     *
+     * Builder class for constructing and submitting reports.
      * @return ReportBuilder object used to assemble reports set to the current Pola API address.
      */
     public ReportBuilder createReport() {
@@ -123,14 +125,17 @@ public class Pola {
                     .queryParam("device_id", deviceId).build().toUriString());
             Gson gson = new Gson();
             String reportJson = gson.toJson(reportRequest);
+
             URLConnection urlConn = url.openConnection();
             urlConn.setDoInput(true);
             urlConn.setDoOutput(true);
             urlConn.setUseCaches(false);
+
             urlConn.setRequestProperty("Content-Type", "application/json");
             DataOutputStream printout = new DataOutputStream(urlConn.getOutputStream());
             printout.writeBytes(reportJson);
             printout.close();
+
             //response reading code:
             StringBuilder responseJson = new StringBuilder();
             BufferedReader reader = new BufferedReader(new InputStreamReader(urlConn.getInputStream()));
@@ -151,14 +156,17 @@ public class Pola {
         private void sendReportFiles(ReportRequestResponse reportRequestResponse) throws IOException {
             List<InputStream> fileStreamList = new ArrayList<>(fileStreams);
             String[] uploadUriList = reportRequestResponse.getSignedRequests();
+
             for (int i = 0; i < fileStreamList.size(); i++) {
                 URL url = new URL(uploadUriList[i]);
                 InputStream streamFrom = fileStreamList.get(i);
+
                 HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
                 httpConn.setDoOutput(true);
                 httpConn.setRequestMethod("PUT");
                 httpConn.setRequestProperty("x-amz-acl", "public-read");
                 httpConn.setRequestProperty("Content-Type", reportRequest.getMimeType());
+
                 OutputStream streamTo = httpConn.getOutputStream();
                 IOUtils.copy(streamFrom, streamTo);
                 streamFrom.close();
