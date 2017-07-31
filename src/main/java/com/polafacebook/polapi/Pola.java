@@ -183,7 +183,7 @@ public class Pola {
             }
 
             httpConn.disconnect();
-
+            
             return gson.fromJson(responseJson.toString(), ReportRequestResponse.class);
         }
 
