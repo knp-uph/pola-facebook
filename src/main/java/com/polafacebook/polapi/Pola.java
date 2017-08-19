@@ -51,8 +51,12 @@ public class Pola {
     public Result getByCode(String code) throws IOException {
         URL url = new URL(UriComponentsBuilder.fromUriString(polaApiUrl + "get_by_code")
                 .queryParam("code", code)
-                .queryParam("device_id", deviceId).build().toUriString());
+                .queryParam("device_id", deviceId)
+                .queryParam("noai")
+                .build().toUriString());
+
         HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
+        httpConn.setRequestMethod("GET");
 
         final int responseCode = httpConn.getResponseCode();
         if (responseCode != 200) {
@@ -149,7 +153,8 @@ public class Pola {
          */
         private ReportRequestResponse sendReportRequest() throws IOException {
             URL url = new URL(UriComponentsBuilder.fromUriString(polaApiUrl + "create_report")
-                    .queryParam("device_id", deviceId).build().toUriString());
+                    .queryParam("device_id", deviceId)
+                    .build().toUriString());
             Gson gson = new Gson();
             String reportJson = gson.toJson(reportRequest);
 
