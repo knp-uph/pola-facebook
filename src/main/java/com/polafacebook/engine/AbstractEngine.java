@@ -8,7 +8,6 @@ import com.polafacebook.engine.query.PlatformQuery;
 public abstract class AbstractEngine {
     protected Context context;
 
-
     public void setContext(Context context) {
         this.context = context;
     }

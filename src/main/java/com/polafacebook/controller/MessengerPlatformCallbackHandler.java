@@ -13,6 +13,11 @@ import com.github.messenger4j.send.buttons.Button;
 import com.github.messenger4j.send.templates.ButtonTemplate;
 import com.github.messenger4j.send.templates.GenericTemplate;
 import com.github.messenger4j.send.templates.ReceiptTemplate;
+import com.polafacebook.engine.AbstractEngine;
+import com.polafacebook.engine.EngineResponse;
+import com.polafacebook.engine.SwitchEngine;
+import com.polafacebook.engine.platform.Platform;
+import com.polafacebook.engine.query.PlatformQuery;
 import com.polafacebook.service.BarCodeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +39,7 @@ import static com.github.messenger4j.MessengerPlatform.*;
  */
 @RestController
 @RequestMapping("/callback")
-public class MessengerPlatformCallbackHandler {
+public class MessengerPlatformCallbackHandler implements Platform{
 
     private static final String RESOURCE_URL =
             "https://raw.githubusercontent.com/fbsamples/messenger-platform-samples/master/node/public";
@@ -43,6 +48,8 @@ public class MessengerPlatformCallbackHandler {
 
     private final MessengerReceiveClient receiveClient;
     private final MessengerSendClient sendClient;
+    //platform stuff//////////////////////////////////////////////////////////////////
+    private final AbstractEngine botEngine = new SwitchEngine();
 
     @Autowired
     private BarCodeService barCodeService;
@@ -462,5 +469,10 @@ public class MessengerPlatformCallbackHandler {
 
     private void handleSendException(Exception e) {
         logger.error("Message could not be sent. An unexpected error occurred.", e);
+    }
+
+    //platform stuff//////////////////////////////////////////////////////////////////
+    private EngineResponse sendQuery(PlatformQuery query) {
+        botEngine.getResponse(query);
     }
 }
