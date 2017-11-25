@@ -1,7 +1,10 @@
 package com.polafacebook.polapi;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.Map;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Result {
     private int product_id;
     private String code;
@@ -62,6 +65,22 @@ public class Result {
 
     public int getPlNotGlobEnt() {
         return plNotGlobEnt;
+    }
+
+    public boolean isPlWorkers() {
+        return plWorkers == 100;
+    }
+
+    public boolean isPlRnD() {
+        return plRnD == 100;
+    }
+
+    public boolean isPlRegistered() {
+        return plRegistered == 100;
+    }
+
+    public boolean isPlNotGlobEnt() {
+        return plNotGlobEnt == 100;
     }
 
     public String getDescription() {
