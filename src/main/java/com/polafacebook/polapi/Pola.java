@@ -37,6 +37,7 @@ public class Pola {
         this.polaApiUrl = polaApiUrl;
     }
 
+
     /**
      * Initializes and sets the URL string used to connect with Pola API to the default value of "https://www.pola-app.pl/a/v2/".
      */
@@ -51,8 +52,12 @@ public class Pola {
     public Result getByCode(String code) throws IOException {
         URL url = new URL(UriComponentsBuilder.fromUriString(polaApiUrl + "get_by_code")
                 .queryParam("code", code)
-                .queryParam("device_id", deviceId).build().toUriString());
+                .queryParam("device_id", deviceId)
+                .queryParam("noai")
+                .build().toUriString());
+
         HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
+        httpConn.setRequestMethod("GET");
 
         final int responseCode = httpConn.getResponseCode();
         if (responseCode != 200) {
@@ -149,7 +154,8 @@ public class Pola {
          */
         private ReportRequestResponse sendReportRequest() throws IOException {
             URL url = new URL(UriComponentsBuilder.fromUriString(polaApiUrl + "create_report")
-                    .queryParam("device_id", deviceId).build().toUriString());
+                    .queryParam("device_id", deviceId)
+                    .build().toUriString());
             Gson gson = new Gson();
             String reportJson = gson.toJson(reportRequest);
 
@@ -230,4 +236,25 @@ public class Pola {
         return deviceId;
     }
 
+
+    public static void main(String... args) throws IOException {
+        Pola P = new Pola();
+        try {
+            //System.out.println(P.getByCode("5906441211478"));
+
+            System.out.println(P.getByCode("5902759005488"));
+//            System.out.println(P.createReport()
+//                    .setDescription("test")
+//                    .setDeviceId("test")
+//                    .setProductId(305082)
+//                    .setMimeType("image/png")
+//                    .setFileExtension("png")
+//                    .addFile(new FileInputStream(new File("D:/Piotr/Pictures/This is a test file.png")))
+//                    .addFile(new FileInputStream(new File("D:/Piotr/Pictures/This is a test file 2.png")))
+//                    .send());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 }
