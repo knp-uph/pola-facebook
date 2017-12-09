@@ -77,8 +77,13 @@ public class ConversationEngine extends AbstractEngine {
 
         currentId = incomingMessage.getSenderId();
 
+        //TODO: move somewhere else
+        if (incomingMessage.hasPayload() && incomingMessage.getPayload().equals("INIT")) {
+            resetState();
+        }
+
         MachineState to = null;
-        Context context = contextRepositoryManager.getOrCreateContext(incomingMessage.getSenderId());
+        Context context = contextRepositoryManager.getOrCreateContext(currentId);
 
         logger.debug("Context: {}" , context);
 

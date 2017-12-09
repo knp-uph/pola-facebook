@@ -35,10 +35,21 @@ public class FacebookEventHandler {
     private final FacebookEventHelper facebookEventHelper;
     private final MessengerSendClient sendClient;
 
+    private Date lastTimestampServed = new Date(0L);
+
     public FacebookEventHandler(ConversationEngine conversationEngine, MessengerSendClient sendClient, FacebookEventHelper facebookEventHelper) {
         this.conversationEngine = conversationEngine;
         this.facebookEventHelper = facebookEventHelper;
         this.sendClient = sendClient;
+    }
+
+
+    private boolean hasBeenServed(Date timestamp) {
+        return lastTimestampServed.after(timestamp);
+    }
+
+    private void promptEngine(IncomingMessage message) {
+        conversationEngine.doAction(message);
     }
 
     private void sendMarkSeen(String senderId) {
@@ -52,29 +63,48 @@ public class FacebookEventHandler {
     }
 
     public void onTextMessageEvent(TextMessageEvent event) {
+        final Date timestamp = event.getTimestamp();
+        if (this.hasBeenServed(timestamp)) {
+            logger.debug("Discarding a duplicate event: ", event);
+            return;
+        }
+
         final String messageText = event.getText();
         final String senderId = event.getSender().getId();
 
         IncomingMessage toEngineMessage = new IncomingMessage(messageText, senderId);
         sendMarkSeen(senderId);
-        conversationEngine.doAction(toEngineMessage);
+
+        this.promptEngine(toEngineMessage);
+        lastTimestampServed = timestamp;
     }
 
     public void onQuickReplyMessageEvent(QuickReplyMessageEvent event) {
+        final Date timestamp = event.getTimestamp();
+        if (this.hasBeenServed(timestamp)) {
+            logger.debug("Discarding a duplicate event: ", event);
+            return;
+        }
+
         final String senderId = event.getSender().getId();
         final String text = event.getText();
         final String quickReplyPayload = event.getQuickReply().getPayload();
 
         IncomingMessage toEngineMessage = new IncomingMessage(text, senderId, quickReplyPayload);
         sendMarkSeen(senderId);
-        conversationEngine.doAction(toEngineMessage);
+
+        this.promptEngine(toEngineMessage);
+        lastTimestampServed = timestamp;
     }
 
     public void onAttachmentMessageEvent(AttachmentMessageEvent event) {
-        final String senderId = event.getSender().getId();
         final Date timestamp = event.getTimestamp();
-        final String messageId = event.getMid();
+        if (this.hasBeenServed(timestamp)) {
+            logger.debug("Discarding a duplicate event: ", event);
+            return;
+        }
 
+        final String senderId = event.getSender().getId();
 
         /*
         //TODO: place it elsewhere in a converter?
@@ -109,24 +139,30 @@ public class FacebookEventHandler {
                 default:
                     logger.debug("Unsupported attachment type received: " + attachmentType);
             }
-            //TODO: potential bottleneck here
-            conversationEngine.doAction(toEngineMessage);
 
+            this.promptEngine(toEngineMessage);
+            lastTimestampServed = timestamp;
         });
     }
 
     public void onPostbackEvent(PostbackEvent event) {
+        final Date timestamp = event.getTimestamp();
+        if (this.hasBeenServed(timestamp)) {
+            logger.debug("Discarding a duplicate event: ", event);
+            return;
+        }
+
         logger.debug("Received PostbackEvent: {}", event);
 
         final String senderId = event.getSender().getId();
         final String recipientId = event.getRecipient().getId();
         final String payload = event.getPayload();
-        final Date timestamp = event.getTimestamp();
 
         logger.info("Received postback for user '{}' and page '{}' with payload '{}' at '{}'",
                 senderId, recipientId, payload, timestamp);
 
-        conversationEngine.doAction(new IncomingMessage("", senderId, payload));
+        this.promptEngine(new IncomingMessage("", senderId, payload));
+        lastTimestampServed = timestamp;
     }
 
     //TODO: opt-ins?

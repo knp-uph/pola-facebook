@@ -10,17 +10,29 @@ import java.util.List;
  */
 public abstract class Message {
     protected String text;
+    protected final String payload;
     protected List<Attachment> attachments = new ArrayList<>();
+
+    public Message(String text, String payload) {
+        this.text = text;
+        this.payload = payload;
+    }
 
     public Message(String text) {
         this.text = text;
+        payload = null;
     }
 
     public Message() {
+        payload = null;
     }
 
     public String getText() {
         return text;
+    }
+
+    public String getPayload() {
+        return payload;
     }
 
     public boolean hasAttachments() {
@@ -32,6 +44,10 @@ public abstract class Message {
             if (a.type == type) return true;
         }
         return false;
+    }
+
+    public boolean hasPayload() {
+        return  payload != null;
     }
 
     public boolean addAttachment(Attachment attachment) {
