@@ -5,7 +5,6 @@ package com.polafacebook.process.engine.message;
  */
 public class IncomingMessage extends Message {
     private String senderId;
-    private String payload;
 
     public IncomingMessage() {
     }
@@ -16,23 +15,19 @@ public class IncomingMessage extends Message {
     }
 
     public IncomingMessage(String text, String senderId, String payload) {
-        super(text);
+        super(text, payload);
         this.senderId = senderId;
-        this.payload = payload;
     }
 
     public String getSenderId() {
         return senderId;
     }
 
-    public String getPayload() {
-        return payload;
-    }
-
     @Override
     public String toString() {
         return "IncomingMessage{" +
                 "senderId='" + senderId + '\'' +
+                ", payload='" + payload + '\'' +
                 ", text='" + text + '\'' +
                 ", attachments=" + attachments +
                 '}';

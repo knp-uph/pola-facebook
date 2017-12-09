@@ -2,11 +2,9 @@ package com.adapters.outgoing.facebook;
 
 import com.github.messenger4j.exceptions.MessengerApiException;
 import com.github.messenger4j.exceptions.MessengerIOException;
-import com.github.messenger4j.send.MessengerSendClient;
-import com.github.messenger4j.send.NotificationType;
-import com.github.messenger4j.send.QuickReply;
-import com.github.messenger4j.send.Recipient;
+import com.github.messenger4j.send.*;
 import com.polafacebook.ports.outgoing.OnNewOutgoingMessageListener;
+import com.polafacebook.process.engine.message.Action;
 import com.polafacebook.process.engine.message.OutgoingMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +33,9 @@ public class FacebookMessageSender implements OnNewOutgoingMessageListener {
             Iterator<String> iterator = splitter.split(text).iterator();
 
             while (iterator.hasNext()) {
+                this.sendClient.sendSenderAction(recipient, NotificationType.NO_PUSH, SenderAction.TYPING_ON);
                 String msg = iterator.next();
+
                 if (iterator.hasNext()) {
                     this.sendClient.sendTextMessage(recipient, notificationType, msg, metadata);
                 } else if (quickReplies != null) {
@@ -49,7 +49,7 @@ public class FacebookMessageSender implements OnNewOutgoingMessageListener {
         }
     }
 
-    private void sendQuickReplies(OutgoingMessage fromEngineMessage) throws MessengerApiException, MessengerIOException {
+    private void sendWithQuickReplies(OutgoingMessage fromEngineMessage) {
         List<QuickReply> quickReplies;
         QuickReply.ListBuilder listBuilder = com.github.messenger4j.send.QuickReply.newListBuilder();
 
@@ -74,17 +74,25 @@ public class FacebookMessageSender implements OnNewOutgoingMessageListener {
         logger.debug("Sending new message: " + message);
 
         if (message.hasQuickReplies()) {
-            try {
-                sendQuickReplies(message);
-            } catch (MessengerApiException | MessengerIOException e) {
-                handleSendException(e);
-            }
+            sendWithQuickReplies(message);
         } else {
-            this.sendTextMessage(message.getRecipientId(), message.getText());
+            if (message.hasAction()) {
+                this.sendAction(message.getRecipientId(), message.getAction());
+            } else {
+                this.sendTextMessage(message.getRecipientId(), message.getText());
+            }
         }
     }
 
     private void sendTextMessage(String recipientId, String text) {
         sendTextMessage(recipientId, text, null);
+    }
+
+    private void sendAction(String recipientId, Action action) {
+        try {
+            this.sendClient.sendSenderAction(recipientId, SenderAction.valueOf(action.toString()));
+        } catch (MessengerApiException | MessengerIOException e) {
+            handleSendException(e);
+        }
     }
 }

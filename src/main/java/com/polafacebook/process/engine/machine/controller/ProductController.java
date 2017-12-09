@@ -5,6 +5,7 @@ import com.polafacebook.polapi.Pola;
 import com.polafacebook.polapi.Result;
 import com.polafacebook.ports.outgoing.OnNewOutgoingMessageListener;
 import com.polafacebook.process.engine.machine.MachineState;
+import com.polafacebook.process.engine.message.Action;
 import com.polafacebook.process.engine.message.OutgoingMessage;
 import com.polafacebook.process.service.BarCodeService;
 
@@ -33,7 +34,7 @@ public class ProductController {
     }
 
     public MachineState onImage(MachineState from, MachineState to, Context context) {
-        listener.onNewMessage(new OutgoingMessage("Przetwarzam obrazek. ", context.userId));
+        listener.onNewMessage(new OutgoingMessage(Action.TYPING_ON, context.userId));
         String code;
         try {
             code = barCodeService.processBarCode(context.lastAttachment.getInputStream());
