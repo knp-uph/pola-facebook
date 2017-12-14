@@ -9,7 +9,7 @@ public class UrlAttachmentToUrlAttachmentEntityConverter {
             return new AttachmentEntity();
         }
         AttachmentEntity attachmentEntity = new AttachmentEntity();
-        attachmentEntity.type = attachment.toString();
+        attachmentEntity.type = attachment.type.toString();
         attachmentEntity.url = attachment.url.toString();
 
         return attachmentEntity;

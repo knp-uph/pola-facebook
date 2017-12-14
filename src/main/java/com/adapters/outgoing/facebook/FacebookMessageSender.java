@@ -43,6 +43,7 @@ public class FacebookMessageSender implements OnNewOutgoingMessageListener {
                 } else {
                     this.sendClient.sendTextMessage(recipient, notificationType, msg, metadata);
                 }
+                //this.sendClient.sendSenderAction(recipient, NotificationType.NO_PUSH, SenderAction.TYPING_OFF);
             }
         } catch (MessengerApiException | MessengerIOException e) {
             handleSendException(e);

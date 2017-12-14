@@ -43,9 +43,10 @@ public class FacebookEventHandler {
         this.sendClient = sendClient;
     }
 
-
     private boolean hasBeenServed(Date timestamp) {
-        return lastTimestampServed.after(timestamp);
+        boolean result = timestamp.compareTo(lastTimestampServed) <= 0;
+        lastTimestampServed = timestamp;
+        return result;
     }
 
     private void promptEngine(IncomingMessage message) {
@@ -65,7 +66,7 @@ public class FacebookEventHandler {
     public void onTextMessageEvent(TextMessageEvent event) {
         final Date timestamp = event.getTimestamp();
         if (this.hasBeenServed(timestamp)) {
-            logger.debug("Discarding a duplicate event: ", event);
+            logger.debug("Discarding a duplicate event: " + event.getMid() + " with timestamp " + event.getTimestamp(), event);
             return;
         }
 
@@ -76,7 +77,6 @@ public class FacebookEventHandler {
         sendMarkSeen(senderId);
 
         this.promptEngine(toEngineMessage);
-        lastTimestampServed = timestamp;
     }
 
     public void onQuickReplyMessageEvent(QuickReplyMessageEvent event) {
@@ -94,7 +94,6 @@ public class FacebookEventHandler {
         sendMarkSeen(senderId);
 
         this.promptEngine(toEngineMessage);
-        lastTimestampServed = timestamp;
     }
 
     public void onAttachmentMessageEvent(AttachmentMessageEvent event) {
@@ -141,7 +140,6 @@ public class FacebookEventHandler {
             }
 
             this.promptEngine(toEngineMessage);
-            lastTimestampServed = timestamp;
         });
     }
 
@@ -162,7 +160,6 @@ public class FacebookEventHandler {
                 senderId, recipientId, payload, timestamp);
 
         this.promptEngine(new IncomingMessage("", senderId, payload));
-        lastTimestampServed = timestamp;
     }
 
     //TODO: opt-ins?
