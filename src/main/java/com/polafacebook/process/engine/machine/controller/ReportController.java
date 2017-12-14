@@ -90,7 +90,7 @@ public class ReportController {
 
     public MachineState onText(MachineState from, MachineState to, Context context) {
         context.description = context.lastText;
-        listener.onNewMessage(new OutgoingMessage("Super! Prześlij nam teraz jakieś fotki produktu do raportu. ;)", context.userId));
+        listener.onNewMessage(new OutgoingMessage("Super! Prześlij nam teraz jakieś fotki kodu kreskowego i etykiety produktu do raportu. ;)", context.userId));
         return MachineState.WAIT_FOR_IMAGE_OR_SUBMISSION;
     }
 

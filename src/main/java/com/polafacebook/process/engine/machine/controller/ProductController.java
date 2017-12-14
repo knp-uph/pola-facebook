@@ -48,6 +48,7 @@ public class ProductController {
         }
 
         try {
+            listener.onNewMessage(new OutgoingMessage(Action.TYPING_ON, context.userId));
             return queryDB(code, context);
         } catch (IOException e) {
             e.printStackTrace();
