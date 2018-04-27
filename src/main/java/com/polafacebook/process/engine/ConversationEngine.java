@@ -8,6 +8,7 @@ import com.polafacebook.process.engine.machine.MachineState;
 import com.polafacebook.process.engine.machine.TransitionListener;
 import com.polafacebook.process.engine.machine.dispatcher.StateDispatcher;
 import com.polafacebook.process.engine.message.IncomingMessage;
+import io.sentry.Sentry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
