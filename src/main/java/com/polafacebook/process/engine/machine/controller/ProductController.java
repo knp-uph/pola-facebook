@@ -36,6 +36,7 @@ public class ProductController {
     public MachineState onImage(MachineState from, MachineState to, Context context) {
         listener.onNewMessage(new OutgoingMessage(Action.TYPING_ON, context.userId));
         String code;
+        //retrieve the code from the barcode image:
         try {
             code = barCodeService.processBarCode(context.lastAttachment.getInputStream());
             if (code == null) {
@@ -46,24 +47,14 @@ public class ProductController {
             e.printStackTrace();
             return MachineState.NOT_RECOGNIZED;
         }
-
-        try {
-            listener.onNewMessage(new OutgoingMessage(Action.TYPING_ON, context.userId));
-            return queryDB(code, context);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return handleDBError(context);
-        }
+        //query the database for details on the product:
+        listener.onNewMessage(new OutgoingMessage(Action.TYPING_ON, context.userId));
+        return queryDB(code, context);
     }
 
     public MachineState onText(MachineState from, MachineState to, Context context) {
         listener.onNewMessage(new OutgoingMessage("Kod produktu otrzymany: " + context.eanCode, context.userId));
-        try {
-            return queryDB(context.eanCode, context);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return handleDBError(context);
-        }
+        return queryDB(context.eanCode, context);
     }
 
     public MachineState onNotRecognized(MachineState from, MachineState to, Context context) {
@@ -98,9 +89,16 @@ public class ProductController {
         return MachineState.WELCOME;
     }
 
-    private MachineState queryDB(String code, Context context) throws IOException {
-        Result result = polaService.getByCode(code);
+    private MachineState queryDB(String code, Context context)  {
+        Result result = null;
+        try {
+            result = polaService.getByCode(code);
+        } catch (IOException e) {
+            return handleDBError(context);
+        }
+
         context.result = result;
+
         if (result.getDescription() != null) {
             return MachineState.DISPLAY_RESULTS;
         } else {

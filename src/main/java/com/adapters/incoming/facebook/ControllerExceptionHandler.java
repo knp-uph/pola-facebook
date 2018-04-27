@@ -7,6 +7,7 @@ import com.github.messenger4j.exceptions.MessengerIOException;
 import com.github.messenger4j.send.MessengerSendClient;
 import com.github.messenger4j.send.QuickReply;
 import com.polafacebook.process.engine.ConversationEngine;
+import io.sentry.Sentry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -19,15 +20,15 @@ public class ControllerExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(ControllerExceptionHandler.class);
     private final MessengerSendClient sendClient;
 
-    ConversationEngine conversationEngine;
-
+    private ConversationEngine conversationEngine;
 
     public ControllerExceptionHandler(MessengerSendClient sendClient, ConversationEngine conversationEngine) {
         this.sendClient = sendClient;
         this.conversationEngine = conversationEngine;
+        Sentry.init();
     }
 
-    @ResponseStatus(HttpStatus.OK)  // 200, we're pretending it's all fine <insert meme here>
+    @ResponseStatus(HttpStatus.OK)  // 200, we're pretending everything's fine <insert meme here>
     @ExceptionHandler(Exception.class)
     public void handleDefaultError(Exception e) {
         logger.error("The application has thrown something!", e);
@@ -35,7 +36,7 @@ public class ControllerExceptionHandler {
             try {
                 conversationEngine.resetState();
             } catch (Exception internalError) {
-                logger.error("Failed to reset conversation state.", e);
+                logger.error("Failed to reset conversation state.", internalError);
             }
 
             String id = conversationEngine.getCurrentId();

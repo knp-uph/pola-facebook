@@ -181,25 +181,25 @@ public class ApplicationConfig {
 
     @Bean
     ConversationEngine conversationEngine(
-                                          ContextManager contextRepository,
-                                          @Qualifier("dispatchers") HashMap<MachineState, StateDispatcher> dispatchers,
-                                          OnNewOutgoingMessageListener outgoingMessageListener,
-                                          Flow machineFlow) {
+            ContextManager contextRepository,
+            @Qualifier("dispatchers") HashMap<MachineState, StateDispatcher> dispatchers,
+            OnNewOutgoingMessageListener outgoingMessageListener,
+            Flow machineFlow) {
         return new ConversationEngine(contextRepository, dispatchers, outgoingMessageListener, machineFlow);
     }
 
 
-/*
-    @Bean
-    public MessengerReceiveClient receiveClient(@Value("${messenger4j.appSecret}") String appSecret, @Value("${messenger4j.verifyToken}") String verifyToken, FacebookEventHandler handler) {
-        return MessengerPlatform.newReceiveClientBuilder(appSecret, verifyToken)
-                .onTextMessageEvent(handler::onTextMessageEvent)
-                .onAttachmentMessageEvent(handler::onAttachmentMessageEvent)
-                .onQuickReplyMessageEvent(handler::onQuickReplyMessageEvent)
-                .onPostbackEvent(handler::onPostbackEvent)
-                .build();
-    }
-    */
+    /*
+        @Bean
+        public MessengerReceiveClient receiveClient(@Value("${messenger4j.appSecret}") String appSecret, @Value("${messenger4j.verifyToken}") String verifyToken, FacebookEventHandler handler) {
+            return MessengerPlatform.newReceiveClientBuilder(appSecret, verifyToken)
+                    .onTextMessageEvent(handler::onTextMessageEvent)
+                    .onAttachmentMessageEvent(handler::onAttachmentMessageEvent)
+                    .onQuickReplyMessageEvent(handler::onQuickReplyMessageEvent)
+                    .onPostbackEvent(handler::onPostbackEvent)
+                    .build();
+        }
+        */
     @Bean
     public MessengerReceiveClient receiveClient(FacebookEventHandler handler) {
         return MessengerPlatform.newReceiveClientBuilder(System.getenv("messenger4j.appSecret"), System.getenv("messenger4j.verifyToken"))
@@ -231,9 +231,10 @@ public class ApplicationConfig {
         return MessengerPlatform.newSetupClientBuilder(System.getenv("messenger4j.pageAccessToken")).build();
     }
 
-    @Bean
+/*    @Bean
     public ServletContextInitializer sentryServletContextInitializer() {
         return new io.sentry.spring.SentryServletContextInitializer();
     }
+*/
 }
 
