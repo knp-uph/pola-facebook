@@ -56,7 +56,7 @@ public class ReportController {
             }
             polaReport.send();
 
-            listener.onNewMessage(new OutgoingMessage("Dziękuję. Wysłałem raport. :P", context.userId));
+            listener.onNewMessage(new OutgoingMessage("Dziękuję. Wysłałem raport. Jak mogę Ci jeszcze pomóc?", context.userId));
         } catch (IOException e) {
             e.printStackTrace();
             listener.onNewMessage(new OutgoingMessage("Ups! Mamy usterkę, nie udało mi się wysłać raportu. Może spróbuj później?", context.userId));
