@@ -1,4 +1,4 @@
-package com.polafacebook.polapi;
+package com.polafacebook.process.service.polapi;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

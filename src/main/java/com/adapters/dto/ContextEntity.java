@@ -1,6 +1,6 @@
 package com.adapters.dto;
 
-import com.polafacebook.polapi.Result;
+import com.polafacebook.process.service.polapi.Result;
 
 import java.util.ArrayList;
 

@@ -2,9 +2,7 @@ package com.polafacebook.process.engine.message.attachment;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.*;
 
 public class UrlAttachment extends Attachment {
 
@@ -31,9 +29,20 @@ public class UrlAttachment extends Attachment {
     }
 
     @Override
+    public URI getUri() {
+        try {
+            return url.toURI();
+        } catch (URISyntaxException e) {
+            return null;
+        }
+    }
+
+    @Override
     public String toString() {
         return "UrlAttachment{" +
                 "url=" + url +
                 '}';
     }
+
+
 }

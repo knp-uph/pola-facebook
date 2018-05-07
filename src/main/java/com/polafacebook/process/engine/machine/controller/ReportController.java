@@ -1,11 +1,12 @@
 package com.polafacebook.process.engine.machine.controller;
 
+import com.polafacebook.BotResponses;
 import com.polafacebook.model.Context;
-import com.polafacebook.polapi.Pola;
 import com.polafacebook.ports.outgoing.OnNewOutgoingMessageListener;
 import com.polafacebook.process.engine.machine.MachineState;
 import com.polafacebook.process.engine.message.OutgoingMessage;
 import com.polafacebook.process.engine.message.attachment.Attachment;
+import com.polafacebook.process.service.polapi.Pola;
 
 import java.io.IOException;
 
@@ -19,25 +20,25 @@ public class ReportController {
     }
 
     public MachineState onInvalidInput1(MachineState from, MachineState to, Context context) {
-        OutgoingMessage outgoingMessage = new OutgoingMessage("Nie rozumiem. Tak czy nie? A może chcesz podać kolejny kod i wrócić do początku?", context.userId);
+        OutgoingMessage outgoingMessage = new OutgoingMessage(BotResponses.ReportController.onInvalidInput1.text, context.userId);
 
-        outgoingMessage.addQuickReply("Nie zgłaszam. Wróć.", "NEGATIVE");
-        outgoingMessage.addQuickReply("Tak, zgłaszam brak.", "AFFIRMATIVE");
+        outgoingMessage.addQuickReply(BotResponses.ReportController.onInvalidInput1.quickReplyNo, "NEGATIVE");
+        outgoingMessage.addQuickReply(BotResponses.ReportController.onInvalidInput1.quickReplyYes, "AFFIRMATIVE");
 
         listener.onNewMessage(outgoingMessage);
         return MachineState.WAIT_FOR_DECISION_OR_ACTION_1;
     }
 
     public MachineState onInvalidInput2(MachineState from, MachineState to, Context context) {
-        listener.onNewMessage(new OutgoingMessage("Nie rozumiem. Może po prostu mi coś napisz?", context.userId));
+        listener.onNewMessage(new OutgoingMessage(BotResponses.ReportController.onInvalidInput2.text, context.userId));
         return MachineState.WAIT_FOR_TEXT_1;
     }
 
     public MachineState onInvalidInput3(MachineState from, MachineState to, Context context) {
-        OutgoingMessage outgoingMessage = new OutgoingMessage("Nie rozumiem. :/ Jeśli chcesz zakończyć wypełniane raportu, to napisz 'ok' albo 'gotowe'. Możesz też go anulować lub dodać kolejne zdjęcie.", context.userId);
+        OutgoingMessage outgoingMessage = new OutgoingMessage(BotResponses.ReportController.onInvalidInput3.text, context.userId);
 
-        outgoingMessage.addQuickReply("Gotowe.", "SUBMIT");
-        outgoingMessage.addQuickReply("Anuluj.", "CANCEL");
+        outgoingMessage.addQuickReply(BotResponses.ReportController.submitQuickReply, "SUBMIT");
+        outgoingMessage.addQuickReply(BotResponses.ReportController.cancelQuickReply, "CANCEL");
 
         listener.onNewMessage(outgoingMessage);
 
@@ -52,14 +53,15 @@ public class ReportController {
                     .setMimeType("image/jpg")
                     .setFileExtension("jpg");
             for (Attachment attachment : context.attachments) {
-                polaReport.addFile(attachment.getInputStream());
+                //TODO: refactor into hexagonal architecture
+                polaReport.addFileFromUrl(attachment.getUri().toURL());
             }
             polaReport.send();
 
-            listener.onNewMessage(new OutgoingMessage("Dziękuję. Wysłałem raport. Jak mogę Ci jeszcze pomóc?", context.userId));
+            listener.onNewMessage(new OutgoingMessage(BotResponses.ReportController.onSubmit.text, context.userId));
         } catch (IOException e) {
             e.printStackTrace();
-            listener.onNewMessage(new OutgoingMessage("Ups! Mamy usterkę, nie udało mi się wysłać raportu. Może spróbuj później?", context.userId));
+            listener.onNewMessage(new OutgoingMessage(BotResponses.ReportController.onSubmit.error, context.userId));
         } finally {
             context.attachments.clear();
         }
@@ -69,36 +71,36 @@ public class ReportController {
     public MachineState onCancel(MachineState from, MachineState to, Context context) {
         context.attachments.clear();
 
-        listener.onNewMessage(new OutgoingMessage("Spoko, raport anulowany. Dzięki!", context.userId));
+        listener.onNewMessage(new OutgoingMessage(BotResponses.ReportController.onCancel.text, context.userId));
         return MachineState.WELCOME;
     }
 
     public MachineState onImage(MachineState from, MachineState to, Context context) {
-        OutgoingMessage outgoingMessage = new OutgoingMessage("Przyjąłem! Obrazków łącznie: " + context.attachments.size(), context.userId);
+        OutgoingMessage outgoingMessage = new OutgoingMessage(BotResponses.ReportController.onImage.text + context.attachments.size(), context.userId);
 
-        outgoingMessage.addQuickReply("Gotowe.", "SUBMIT");
-        outgoingMessage.addQuickReply("Anuluj.", "CANCEL");
+        outgoingMessage.addQuickReply(BotResponses.ReportController.submitQuickReply, "SUBMIT");
+        outgoingMessage.addQuickReply(BotResponses.ReportController.cancelQuickReply, "CANCEL");
 
         listener.onNewMessage(outgoingMessage);
         return MachineState.WAIT_FOR_IMAGE_OR_SUBMISSION;
     }
 
     public MachineState onAffirmative(MachineState from, MachineState to, Context context) {
-        listener.onNewMessage(new OutgoingMessage("Super! Podaj nam krótki opis brakującego produktu.", context.userId));
+        listener.onNewMessage(new OutgoingMessage(BotResponses.ReportController.onAffirmative.text, context.userId));
         return MachineState.WAIT_FOR_TEXT_1;
     }
 
     public MachineState onText(MachineState from, MachineState to, Context context) {
         context.description = context.lastText;
-        listener.onNewMessage(new OutgoingMessage("Super! Prześlij nam teraz jakieś fotki kodu kreskowego i etykiety produktu do raportu. ;)", context.userId));
+        listener.onNewMessage(new OutgoingMessage(BotResponses.ReportController.onText.text, context.userId));
         return MachineState.WAIT_FOR_IMAGE_OR_SUBMISSION;
     }
 
     public MachineState onReportPromptImage(MachineState from, MachineState to, Context context) {
-        OutgoingMessage outgoingMessage = new OutgoingMessage("Nie znaleźliśmy tego produktu w naszej bazie danych. Może chcesz zgłosić ten brak?", context.userId);
+        OutgoingMessage outgoingMessage = new OutgoingMessage(BotResponses.ReportController.onReportPromptImage.text, context.userId);
 
-        outgoingMessage.addQuickReply("Nie. Jest okej.", "NEGATIVE");
-        outgoingMessage.addQuickReply("Tak. Chcę zgłosić.", "AFFIRMATIVE");
+        outgoingMessage.addQuickReply(BotResponses.ReportController.onReportPromptImage.quickReplyNo, "NEGATIVE");
+        outgoingMessage.addQuickReply(BotResponses.ReportController.onReportPromptImage.quickReplyYes, "AFFIRMATIVE");
 
         listener.onNewMessage(outgoingMessage);
         return MachineState.WAIT_FOR_DECISION_OR_ACTION_1;

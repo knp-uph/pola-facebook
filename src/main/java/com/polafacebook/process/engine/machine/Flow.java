@@ -1,12 +1,12 @@
 package com.polafacebook.process.engine.machine;
 
-import com.polafacebook.polapi.Pola;
 import com.polafacebook.ports.outgoing.OnNewOutgoingMessageListener;
 import com.polafacebook.process.engine.machine.controller.InfoController;
 import com.polafacebook.process.engine.machine.controller.ProductController;
 import com.polafacebook.process.engine.machine.controller.ReportController;
 import com.polafacebook.process.engine.machine.controller.SuggestionController;
 import com.polafacebook.process.service.BarCodeService;
+import com.polafacebook.process.service.polapi.Pola;
 
 import java.util.HashMap;
 
