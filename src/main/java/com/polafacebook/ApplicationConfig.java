@@ -17,15 +17,14 @@ import com.polafacebook.model.Context;
 import com.polafacebook.model.repositories.ContextManager;
 import com.polafacebook.model.repositories.RedisContextManager;
 import com.polafacebook.model.repositories.RedisRepository;
-import com.polafacebook.polapi.Pola;
 import com.polafacebook.ports.outgoing.OnNewOutgoingMessageListener;
 import com.polafacebook.process.engine.ConversationEngine;
 import com.polafacebook.process.engine.machine.Flow;
 import com.polafacebook.process.engine.machine.MachineState;
 import com.polafacebook.process.engine.machine.dispatcher.*;
 import com.polafacebook.process.service.BarCodeService;
+import com.polafacebook.process.service.polapi.Pola;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.web.servlet.ServletContextInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
@@ -45,7 +44,6 @@ import static com.polafacebook.process.engine.machine.MachineState.*;
 @Configuration
 @EnableRedisRepositories
 public class ApplicationConfig {
-
 
     @Bean
     JedisPoolConfig poolConfig() {
@@ -69,12 +67,14 @@ public class ApplicationConfig {
             jedisConnFactory.setHostName(redistogoUri.getHost());
             jedisConnFactory.setPort(redistogoUri.getPort());
             jedisConnFactory.setTimeout(Protocol.DEFAULT_TIMEOUT);
-            jedisConnFactory.setPassword(redistogoUri.getUserInfo().split(":", 2)[1]);
+            try {
+                jedisConnFactory.setPassword(redistogoUri.getUserInfo().split(":", 2)[1]);
+            } catch (NullPointerException exc) {}
 
             return jedisConnFactory;
 
         } catch (URISyntaxException e) {
-            throw new IllegalStateException(e);
+            throw new IllegalStateException("Redis connection URI is invalid!", e);
         }
     }
 

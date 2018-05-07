@@ -57,9 +57,9 @@ public class FacebookEventHandler {
         try {
             this.sendClient.sendSenderAction(senderId, SenderAction.MARK_SEEN);
         } catch (MessengerApiException e) {
-            logger.error("MARK_SEEN could not be sent. An unexpected error occurred.", e);
+            logger.error("MARK_SEEN could not be sent. An unexpected text occurred.", e);
         } catch (MessengerIOException e) {
-            logger.error("MARK_SEEN could not be sent. An unexpected error occurred.", e);
+            logger.error("MARK_SEEN could not be sent. An unexpected text occurred.", e);
         }
     }
 
@@ -132,7 +132,7 @@ public class FacebookEventHandler {
                     try {
                         toEngineMessage.addAttachment(new UrlAttachment(IMAGE, payloadAsString));
                     } catch (MalformedURLException e) {
-                        logger.error("Image UrlAttachment could not be added. An unexpected error occurred.", e);
+                        logger.error("Image UrlAttachment could not be added. An unexpected text occurred.", e);
                     }
                     break;
                 default:

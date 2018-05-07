@@ -67,7 +67,7 @@ public class FacebookMessageSender implements OnNewOutgoingMessageListener {
     }
 
     private void handleSendException(Exception e) {
-        logger.error("Message could not be sent. An unexpected error occurred.", e);
+        logger.error("Message could not be sent. An unexpected text occurred.", e);
     }
 
     @Override

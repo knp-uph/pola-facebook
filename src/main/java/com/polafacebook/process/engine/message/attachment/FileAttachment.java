@@ -3,6 +3,7 @@ package com.polafacebook.process.engine.message.attachment;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 
 /**
  * Created by Piotr on 24.09.2017.
@@ -19,6 +20,11 @@ public class FileAttachment extends Attachment {
     @Override
     public InputStream getInputStream() throws IOException {
         return new FileInputStream(this.file);
+    }
+
+    @Override
+    public URI getUri() {
+        return URI.create("file://" + file);
     }
 
     @Override

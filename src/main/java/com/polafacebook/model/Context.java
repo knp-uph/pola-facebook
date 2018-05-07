@@ -1,8 +1,8 @@
 package com.polafacebook.model;
 
-import com.polafacebook.polapi.Result;
 import com.polafacebook.process.engine.machine.MachineState;
 import com.polafacebook.process.engine.message.attachment.Attachment;
+import com.polafacebook.process.service.polapi.Result;
 
 import java.util.ArrayList;
 

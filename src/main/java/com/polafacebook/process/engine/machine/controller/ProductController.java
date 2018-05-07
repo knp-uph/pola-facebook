@@ -1,13 +1,14 @@
 package com.polafacebook.process.engine.machine.controller;
 
+import com.polafacebook.BotResponses;
 import com.polafacebook.model.Context;
-import com.polafacebook.polapi.Pola;
-import com.polafacebook.polapi.Result;
 import com.polafacebook.ports.outgoing.OnNewOutgoingMessageListener;
 import com.polafacebook.process.engine.machine.MachineState;
 import com.polafacebook.process.engine.message.Action;
 import com.polafacebook.process.engine.message.OutgoingMessage;
 import com.polafacebook.process.service.BarCodeService;
+import com.polafacebook.process.service.polapi.Pola;
+import com.polafacebook.process.service.polapi.Result;
 
 import java.io.IOException;
 
@@ -42,7 +43,7 @@ public class ProductController {
             if (code == null) {
                 return MachineState.NOT_RECOGNIZED;
             }
-            listener.onNewMessage(new OutgoingMessage("Znaleziono kod: " + code, context.userId));
+            listener.onNewMessage(new OutgoingMessage(BotResponses.ProductController.onImage.text + code, context.userId));
         } catch (IOException e) {
             e.printStackTrace();
             return MachineState.NOT_RECOGNIZED;
@@ -53,16 +54,16 @@ public class ProductController {
     }
 
     public MachineState onText(MachineState from, MachineState to, Context context) {
-        listener.onNewMessage(new OutgoingMessage("Kod produktu otrzymany: " + context.eanCode, context.userId));
+        listener.onNewMessage(new OutgoingMessage(BotResponses.ProductController.onText.text + context.eanCode, context.userId));
         return queryDB(context.eanCode, context);
     }
 
     public MachineState onNotRecognized(MachineState from, MachineState to, Context context) {
-        OutgoingMessage outgoingMessage = new OutgoingMessage("Nie udało nam się pobrać kodu z obrazka. Możesz spróbować wpisać kod ręcznie lub wysłać lepsze zdjęcie.", context.userId);
+        OutgoingMessage outgoingMessage = new OutgoingMessage(BotResponses.ProductController.onNotRecognized.text, context.userId);
 
-        outgoingMessage.addQuickReply("Pomoc", "HELP");
-        outgoingMessage.addQuickReply("Informacje", "INFO");
-        outgoingMessage.addQuickReply("Metodyka", "METHODOLOGY");
+        outgoingMessage.addQuickReply(BotResponses.InfoController.helpQuickReply, "HELP");
+        outgoingMessage.addQuickReply(BotResponses.InfoController.infoQuickReply, "INFO");
+        outgoingMessage.addQuickReply(BotResponses.InfoController.methodologyQuickReply, "METHODOLOGY");
 
         listener.onNewMessage(outgoingMessage);
         return MachineState.WAIT_FOR_ACTION;
@@ -70,13 +71,13 @@ public class ProductController {
 
     public MachineState onDisplayResults(MachineState from, MachineState to, Context context) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Ocena: ").append(context.result.getPlScore()).append("/100").append("\n");
-        sb.append("Producent: ").append(context.result.getName()).append("\n");
-        sb.append("Udział polskiego kapitału: ").append(context.result.getPlCapital()).append("%\n");
-        sb.append(context.result.isPlWorkers() ? CHR_CHECK_MARK : CHR_EX_MARK).append(" produkuje w Polsce\n");
-        sb.append(context.result.isPlRnD() ? CHR_CHECK_MARK : CHR_EX_MARK).append(" prowadzi badania i rozwój w Polsce\n");
-        sb.append(context.result.isPlRegistered() ? CHR_CHECK_MARK : CHR_EX_MARK).append(" zarejestrowana w Polsce\n");
-        sb.append(context.result.isPlNotGlobEnt() ? CHR_CHECK_MARK : CHR_EX_MARK).append(" jest członkiem zagranicznego koncernu\n");
+        sb.append(BotResponses.ProductController.onDisplayResults.ratingText).append(context.result.getPlScore()).append("/100").append("\n");
+        sb.append(BotResponses.ProductController.onDisplayResults.manufacturerText).append(context.result.getName()).append("\n");
+        sb.append(BotResponses.ProductController.onDisplayResults.polishCapitaltext).append(context.result.getPlCapital()).append("%\n");
+        sb.append(context.result.isPlWorkers() ? CHR_CHECK_MARK : CHR_EX_MARK).append(" " + BotResponses.ProductController.onDisplayResults.manufacturesInPolandText + "\n");
+        sb.append(context.result.isPlRnD() ? CHR_CHECK_MARK : CHR_EX_MARK).append(" " +  BotResponses.ProductController.onDisplayResults.hasRndInPolandText + "\n");
+        sb.append(context.result.isPlRegistered() ? CHR_CHECK_MARK : CHR_EX_MARK).append(" " + BotResponses.ProductController.onDisplayResults.isRegisteredInPolandText + "\n");
+        sb.append(context.result.isPlNotGlobEnt() ? CHR_CHECK_MARK : CHR_EX_MARK).append(" " + BotResponses.ProductController.onDisplayResults.isPartOfForeignCorporationText + "\n");
 
         sb.append(context.result.getDescription());
 
@@ -85,12 +86,12 @@ public class ProductController {
     }
 
     private MachineState handleDBError(Context context) {
-        listener.onNewMessage(new OutgoingMessage("Mamy usterkę i nie możemy w tym momencie uzyskać informacji na temat tego kodu. Spróbuj ponownie później. Przepraszamy! ", context.userId));
+        listener.onNewMessage(new OutgoingMessage(BotResponses.ProductController.handleDBError.text, context.userId));
         return MachineState.WELCOME;
     }
 
-    private MachineState queryDB(String code, Context context)  {
-        Result result = null;
+    private MachineState queryDB(String code, Context context) {
+        Result result;
         try {
             result = polaService.getByCode(code);
         } catch (IOException e) {

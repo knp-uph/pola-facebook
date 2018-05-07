@@ -6,6 +6,7 @@ import com.github.messenger4j.exceptions.MessengerApiException;
 import com.github.messenger4j.exceptions.MessengerIOException;
 import com.github.messenger4j.send.MessengerSendClient;
 import com.github.messenger4j.send.QuickReply;
+import com.polafacebook.BotResponses;
 import com.polafacebook.process.engine.ConversationEngine;
 import io.sentry.Sentry;
 import org.slf4j.Logger;
@@ -43,10 +44,10 @@ public class ControllerExceptionHandler {
 
             //TODO: put this elsewhere
             QuickReply.ListBuilder listBuilder = com.github.messenger4j.send.QuickReply.newListBuilder();
-            listBuilder.addTextQuickReply("Spróbujmy od nowa.", "INIT").toList();
+            listBuilder.addTextQuickReply(BotResponses.ControllerExceptionHandler.quickReply, "INIT").toList();
             this.sendClient.sendTextMessage(
                     id,
-                    "Przepraszamy; wystąpił po naszej stronie nieoczekiwany problem. Nasze stado małp-programistów pracuje nad rozwiązaniem! Spróbuj ponownie później.",
+                    BotResponses.ControllerExceptionHandler.text,
                     listBuilder.build());
         } catch (MessengerApiException | MessengerIOException e1) {
             e1.printStackTrace();
