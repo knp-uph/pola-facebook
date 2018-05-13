@@ -1,13 +1,10 @@
 
-package com.adapters.incoming.facebook;
+package com.polafacebook.process.engine.machine.controller;
 
-
-import com.github.messenger4j.exceptions.MessengerApiException;
-import com.github.messenger4j.exceptions.MessengerIOException;
-import com.github.messenger4j.send.MessengerSendClient;
-import com.github.messenger4j.send.QuickReply;
 import com.polafacebook.BotResponses;
+import com.polafacebook.ports.outgoing.OnNewOutgoingMessageListener;
 import com.polafacebook.process.engine.ConversationEngine;
+import com.polafacebook.process.engine.message.OutgoingMessage;
 import io.sentry.Sentry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,12 +16,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ControllerAdvice
 public class ControllerExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(ControllerExceptionHandler.class);
-    private final MessengerSendClient sendClient;
+
+    private final OnNewOutgoingMessageListener listener;
 
     private ConversationEngine conversationEngine;
 
-    public ControllerExceptionHandler(MessengerSendClient sendClient, ConversationEngine conversationEngine) {
-        this.sendClient = sendClient;
+    public ControllerExceptionHandler(OnNewOutgoingMessageListener listener, ConversationEngine conversationEngine) {
+        this.listener = listener;
         this.conversationEngine = conversationEngine;
         Sentry.init();
     }
@@ -33,7 +31,6 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(Exception.class)
     public void handleDefaultError(Exception e) {
         logger.error("The application has thrown something!", e);
-        try {
             try {
                 conversationEngine.resetState();
             } catch (Exception internalError) {
@@ -42,15 +39,10 @@ public class ControllerExceptionHandler {
 
             String id = conversationEngine.getCurrentId();
 
-            //TODO: put this elsewhere
-            QuickReply.ListBuilder listBuilder = com.github.messenger4j.send.QuickReply.newListBuilder();
-            listBuilder.addTextQuickReply(BotResponses.ControllerExceptionHandler.quickReply, "INIT").toList();
-            this.sendClient.sendTextMessage(
-                    id,
-                    BotResponses.ControllerExceptionHandler.text,
-                    listBuilder.build());
-        } catch (MessengerApiException | MessengerIOException e1) {
-            e1.printStackTrace();
-        }
+        OutgoingMessage outgoingMessage = new OutgoingMessage(BotResponses.ControllerExceptionHandler.text, id);
+        outgoingMessage.addQuickReply(BotResponses.ControllerExceptionHandler.quickReply, "INIT");
+
+        listener.onNewMessage(outgoingMessage);
+        logger.debug("Error message dispatched.");
     }
 }

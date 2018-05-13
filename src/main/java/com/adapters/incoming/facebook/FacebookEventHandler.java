@@ -1,21 +1,25 @@
 package com.adapters.incoming.facebook;
 
-import com.github.messenger4j.exceptions.MessengerApiException;
-import com.github.messenger4j.exceptions.MessengerIOException;
-import com.github.messenger4j.receive.events.AttachmentMessageEvent;
-import com.github.messenger4j.receive.events.PostbackEvent;
-import com.github.messenger4j.receive.events.QuickReplyMessageEvent;
-import com.github.messenger4j.receive.events.TextMessageEvent;
-import com.github.messenger4j.send.MessengerSendClient;
-import com.github.messenger4j.send.SenderAction;
+import com.github.messenger4j.Messenger;
+import com.github.messenger4j.exception.MessengerApiException;
+import com.github.messenger4j.exception.MessengerIOException;
+import com.github.messenger4j.send.SenderActionPayload;
+import com.github.messenger4j.send.senderaction.SenderAction;
+import com.github.messenger4j.webhook.Event;
+import com.github.messenger4j.webhook.event.AttachmentMessageEvent;
+import com.github.messenger4j.webhook.event.PostbackEvent;
+import com.github.messenger4j.webhook.event.QuickReplyMessageEvent;
+import com.github.messenger4j.webhook.event.TextMessageEvent;
+import com.github.messenger4j.webhook.event.attachment.Attachment;
+import com.github.messenger4j.webhook.event.attachment.RichMediaAttachment;
 import com.polafacebook.process.engine.ConversationEngine;
 import com.polafacebook.process.engine.message.IncomingMessage;
 import com.polafacebook.process.engine.message.attachment.UrlAttachment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.MalformedURLException;
-import java.util.Date;
+import java.net.URL;
+import java.time.Instant;
 import java.util.List;
 
 import static com.polafacebook.process.engine.message.attachment.Attachment.Type.IMAGE;
@@ -32,18 +36,16 @@ public class FacebookEventHandler {
     private static final Logger logger = LoggerFactory.getLogger(FacebookEventHandler.class);
 
     private final ConversationEngine conversationEngine;
-    private final FacebookEventHelper facebookEventHelper;
-    private final MessengerSendClient sendClient;
+    private final Messenger messenger;
 
-    private Date lastTimestampServed = new Date(0L);
+    private Instant lastTimestampServed = Instant.now();
 
-    public FacebookEventHandler(ConversationEngine conversationEngine, MessengerSendClient sendClient, FacebookEventHelper facebookEventHelper) {
+    public FacebookEventHandler(ConversationEngine conversationEngine, Messenger messenger) {
         this.conversationEngine = conversationEngine;
-        this.facebookEventHelper = facebookEventHelper;
-        this.sendClient = sendClient;
+        this.messenger = messenger;
     }
 
-    private boolean hasBeenServed(Date timestamp) {
+    private boolean hasBeenServed(Instant timestamp) {
         boolean result = timestamp.compareTo(lastTimestampServed) <= 0;
         lastTimestampServed = timestamp;
         return result;
@@ -55,23 +57,21 @@ public class FacebookEventHandler {
 
     private void sendMarkSeen(String senderId) {
         try {
-            this.sendClient.sendSenderAction(senderId, SenderAction.MARK_SEEN);
-        } catch (MessengerApiException e) {
-            logger.error("MARK_SEEN could not be sent. An unexpected text occurred.", e);
-        } catch (MessengerIOException e) {
-            logger.error("MARK_SEEN could not be sent. An unexpected text occurred.", e);
+            this.messenger.send(SenderActionPayload.create(senderId, SenderAction.MARK_SEEN));
+        } catch (MessengerApiException | MessengerIOException e) {
+            logger.error("MARK_SEEN could not be sent. An unexpected erroroccurred.", e);
         }
     }
 
     public void onTextMessageEvent(TextMessageEvent event) {
-        final Date timestamp = event.getTimestamp();
+        final Instant timestamp = event.timestamp();
         if (this.hasBeenServed(timestamp)) {
-            logger.debug("Discarding a duplicate event: " + event.getMid() + " with timestamp " + event.getTimestamp(), event);
+            logger.debug("Discarding a duplicate event: " + event.messageId() + " with timestamp " + event.timestamp(), event);
             return;
         }
 
-        final String messageText = event.getText();
-        final String senderId = event.getSender().getId();
+        final String messageText = event.text();
+        final String senderId = event.senderId();
 
         IncomingMessage toEngineMessage = new IncomingMessage(messageText, senderId);
         sendMarkSeen(senderId);
@@ -80,15 +80,15 @@ public class FacebookEventHandler {
     }
 
     public void onQuickReplyMessageEvent(QuickReplyMessageEvent event) {
-        final Date timestamp = event.getTimestamp();
+        final Instant timestamp = event.timestamp();
         if (this.hasBeenServed(timestamp)) {
             logger.debug("Discarding a duplicate event: ", event);
             return;
         }
 
-        final String senderId = event.getSender().getId();
-        final String text = event.getText();
-        final String quickReplyPayload = event.getQuickReply().getPayload();
+        final String senderId = event.senderId();
+        final String text = event.text();
+        final String quickReplyPayload = event.payload();
 
         IncomingMessage toEngineMessage = new IncomingMessage(text, senderId, quickReplyPayload);
         sendMarkSeen(senderId);
@@ -97,46 +97,32 @@ public class FacebookEventHandler {
     }
 
     public void onAttachmentMessageEvent(AttachmentMessageEvent event) {
-        final Date timestamp = event.getTimestamp();
+        final Instant timestamp = event.timestamp();
         if (this.hasBeenServed(timestamp)) {
             logger.debug("Discarding a duplicate event: ", event);
             return;
         }
 
-        final String senderId = event.getSender().getId();
+        final String senderId = event.senderId();
 
-        /*
-        //TODO: place it elsewhere in a converter?
-        if (facebookEventHelper.isLike(event)) {
-            IncomingMessage toEngineMessage = new IncomingMessage("", senderId, "AFFIRMATIVE");
-            sendMarkSeen(senderId);
-            conversationEngine.doAction(toEngineMessage);
-            return;
-        }
-        */
-
-        final List<AttachmentMessageEvent.Attachment> attachments = event.getAttachments();
+        final List<Attachment> attachments = event.attachments();
 
         attachments.forEach(attachment -> {
-            final AttachmentMessageEvent.AttachmentType attachmentType = attachment.getType();
-            final AttachmentMessageEvent.Payload payload = attachment.getPayload();
-
-            String payloadAsString = null;
-            if (payload.isBinaryPayload()) {
-                payloadAsString = payload.asBinaryPayload().getUrl();
-            }
-
             IncomingMessage toEngineMessage = new IncomingMessage("", senderId);
-            switch (attachmentType) {
-                case IMAGE:
-                    try {
-                        toEngineMessage.addAttachment(new UrlAttachment(IMAGE, payloadAsString));
-                    } catch (MalformedURLException e) {
-                        logger.error("Image UrlAttachment could not be added. An unexpected text occurred.", e);
-                    }
-                    break;
-                default:
-                    logger.debug("Unsupported attachment type received: " + attachmentType);
+
+            if (attachment.isRichMediaAttachment()) {
+                final RichMediaAttachment richMediaAttachment = attachment.asRichMediaAttachment();
+                final RichMediaAttachment.Type type = richMediaAttachment.type();
+                final URL url = richMediaAttachment.url();
+                logger.debug("Received rich media attachment of type '{}' with url: {}", type, url);
+
+                switch (type) {
+                    case IMAGE:
+                        toEngineMessage.addAttachment(new UrlAttachment(IMAGE, url));
+                        break;
+                    default:
+                        logger.debug("Unsupported attachment type received: " + type);
+                }
             }
 
             this.promptEngine(toEngineMessage);
@@ -144,7 +130,7 @@ public class FacebookEventHandler {
     }
 
     public void onPostbackEvent(PostbackEvent event) {
-        final Date timestamp = event.getTimestamp();
+        final Instant timestamp = event.timestamp();
         if (this.hasBeenServed(timestamp)) {
             logger.debug("Discarding a duplicate event: ", event);
             return;
@@ -152,9 +138,9 @@ public class FacebookEventHandler {
 
         logger.debug("Received PostbackEvent: {}", event);
 
-        final String senderId = event.getSender().getId();
-        final String recipientId = event.getRecipient().getId();
-        final String payload = event.getPayload();
+        final String senderId = event.senderId();
+        final String recipientId = event.recipientId();
+        final String payload = (event.payload().isPresent() ? event.payload().get() : "null");
 
         logger.info("Received postback for user '{}' and page '{}' with payload '{}' at '{}'",
                 senderId, recipientId, payload, timestamp);
@@ -162,17 +148,10 @@ public class FacebookEventHandler {
         this.promptEngine(new IncomingMessage("", senderId, payload));
     }
 
-    //TODO: opt-ins?
-    /*
-    public void onOptInEvent(OptInEvent event) {
-        final String senderId = event.getSender().getId();
-        final String recipientId = event.getRecipient().getId();
-        final String passThroughParam = event.getRef();
-        final Date timestamp = event.getTimestamp();
-
-        sendTextMessage(senderId, "Authentication successful");
+    public void onFallback(Event event) {
+        final String senderId = event.senderId();
+        logger.info("Received unsupported message from user '{}'", senderId);
     }
-    */
 
 
 }

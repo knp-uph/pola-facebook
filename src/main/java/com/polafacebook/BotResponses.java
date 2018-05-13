@@ -10,6 +10,10 @@ public class BotResponses {
     private static final String genericReportQuickReply = "Tak. Chcę zgłosić.";
     private static final String genericGoBackQuickReply = "Nie. Wróć.";
 
+    public static final class Setup {
+        public static final String greetingText = "Prześlij kod kreskowy produktu i dowiedz się, jak polski jest jego producent!";
+    }
+
     public static final class SuggestionController {
         public static final class onAskForChangesOrAction {
             public static final String text = "Czy chcesz zgłosić poprawkę do przedstawionych informacji?";

@@ -5,7 +5,7 @@
 
     <groupId>com.polafacebook</groupId>
     <artifactId>polafacebook</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>polafacebook</name>
@@ -25,21 +25,15 @@
     </properties>
 
     <dependencies>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -47,10 +41,11 @@
         </dependency>
 
         <dependency>
-            <groupId>com.github.messenger4j</groupId>
-            <artifactId>messenger4j</artifactId>
-            <version>0.8.0</version>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.4</version>
         </dependency>
+
 
         <dependency>
             <groupId>com.google.zxing</groupId>
@@ -69,13 +64,11 @@
             <artifactId>jedis</artifactId>
             <version>2.5.1</version>
         </dependency>
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
             <version>4.3.12.RELEASE</version>
         </dependency>
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
@@ -94,11 +87,14 @@
             <version>1.7.3</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.github.messenger4j/messenger4j -->
         <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>3.10.0</version>
+            <groupId>com.github.messenger4j</groupId>
+            <artifactId>messenger4j</artifactId>
+            <version>1.0.0-M3</version>
         </dependency>
+
+
     </dependencies>
 
     <repositories>
@@ -114,6 +110,17 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>com.heroku.sdk</groupId>
+                <artifactId>heroku-maven-plugin</artifactId>
+                <version>2.0.0</version>
+            </plugin>
+
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

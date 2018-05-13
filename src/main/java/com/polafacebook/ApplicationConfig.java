@@ -5,14 +5,14 @@ import com.adapters.dto.converters.ContextToRedisContextConverter;
 import com.adapters.dto.converters.RedisContextToContextConverter;
 import com.adapters.dto.converters.UrlAttachmentEntityToUrlAttachmentConverter;
 import com.adapters.dto.converters.UrlAttachmentToUrlAttachmentEntityConverter;
-import com.adapters.incoming.facebook.ControllerExceptionHandler;
 import com.adapters.incoming.facebook.FacebookEventHandler;
-import com.adapters.incoming.facebook.FacebookEventHelper;
 import com.adapters.outgoing.facebook.FacebookMessageSender;
-import com.github.messenger4j.MessengerPlatform;
-import com.github.messenger4j.receive.MessengerReceiveClient;
-import com.github.messenger4j.send.MessengerSendClient;
-import com.github.messenger4j.setup.MessengerSetupClient;
+import com.github.messenger4j.Messenger;
+import com.github.messenger4j.common.SupportedLocale;
+import com.github.messenger4j.messengerprofile.MessengerSettings;
+import com.github.messenger4j.messengerprofile.getstarted.StartButton;
+import com.github.messenger4j.messengerprofile.greeting.Greeting;
+import com.github.messenger4j.messengerprofile.greeting.LocalizedGreeting;
 import com.polafacebook.model.Context;
 import com.polafacebook.model.repositories.ContextManager;
 import com.polafacebook.model.repositories.RedisContextManager;
@@ -21,6 +21,7 @@ import com.polafacebook.ports.outgoing.OnNewOutgoingMessageListener;
 import com.polafacebook.process.engine.ConversationEngine;
 import com.polafacebook.process.engine.machine.Flow;
 import com.polafacebook.process.engine.machine.MachineState;
+import com.polafacebook.process.engine.machine.controller.ControllerExceptionHandler;
 import com.polafacebook.process.engine.machine.dispatcher.*;
 import com.polafacebook.process.service.BarCodeService;
 import com.polafacebook.process.service.polapi.Pola;
@@ -40,6 +41,8 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 
 import static com.polafacebook.process.engine.machine.MachineState.*;
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
 
 @Configuration
 @EnableRedisRepositories
@@ -156,22 +159,9 @@ public class ApplicationConfig {
         return new Flow(listener, polaService, barCodeService);
     }
 
-/*
     @Bean
-    public MessengerSendClient messengerSendClient(@Value("${messenger4j.pageAccessToken}") final String pageAccessToken) {
-        return MessengerPlatform.newSendClientBuilder(pageAccessToken).build();
-    }
-*/
-
-    @Bean
-    public MessengerSendClient messengerSendClient() {
-        return MessengerPlatform.newSendClientBuilder(System.getenv("messenger4j.pageAccessToken")).build();
-    }
-
-
-    @Bean
-    public OnNewOutgoingMessageListener onNewOutgoingMessageListener(MessengerSendClient messengerSendClient) {
-        return new FacebookMessageSender(messengerSendClient);
+    public OnNewOutgoingMessageListener onNewOutgoingMessageListener(Messenger messenger) {
+        return new FacebookMessageSender(messenger);
     }
 
     @Bean
@@ -200,35 +190,37 @@ public class ApplicationConfig {
                     .build();
         }
         */
+
     @Bean
-    public MessengerReceiveClient receiveClient(FacebookEventHandler handler) {
-        return MessengerPlatform.newReceiveClientBuilder(System.getenv("messenger4j.appSecret"), System.getenv("messenger4j.verifyToken"))
-                .onTextMessageEvent(handler::onTextMessageEvent)
-                .onAttachmentMessageEvent(handler::onAttachmentMessageEvent)
-                .onQuickReplyMessageEvent(handler::onQuickReplyMessageEvent)
-                .onPostbackEvent(handler::onPostbackEvent)
-                .build();
+    public FacebookEventHandler facebookEventHandler(ConversationEngine conversationEngine, Messenger messenger) {
+        return new FacebookEventHandler(conversationEngine, messenger);
     }
 
     @Bean
-    public FacebookEventHandler facebookEventHandler(ConversationEngine conversationEngine, MessengerSendClient sendClient) {
-        return new FacebookEventHandler(conversationEngine, sendClient, new FacebookEventHelper());
+    ControllerExceptionHandler controllerExceptionHandler(OnNewOutgoingMessageListener onNewOutgoingMessageListener, ConversationEngine conversationEngine) {
+        return new ControllerExceptionHandler(onNewOutgoingMessageListener, conversationEngine);
     }
 
     @Bean
-    ControllerExceptionHandler controllerExceptionHandler(MessengerSendClient sendClient, ConversationEngine conversationEngine) {
-        return new ControllerExceptionHandler(sendClient, conversationEngine);
+    public Messenger messenger() {
+        return Messenger.create(System.getenv("messenger4j.pageAccessToken"), System.getenv("messenger4j.appSecret"), System.getenv("messenger4j.verifyToken"));
     }
 
-    /*
     @Bean
-    public MessengerSetupClient messengerSetupClient(@Value("${messenger4j.pageAccessToken}") final String pageAccessToken) {
-        return MessengerPlatform.newSetupClientBuilder(pageAccessToken).build();
+    public Greeting greeting() {
+        return Greeting.create("Hello!", LocalizedGreeting.create(SupportedLocale.pl_PL,
+                BotResponses.Setup.greetingText));
     }
-    */
+
     @Bean
-    public MessengerSetupClient messengerSetupClient() {
-        return MessengerPlatform.newSetupClientBuilder(System.getenv("messenger4j.pageAccessToken")).build();
+    public StartButton startButton() {
+        return StartButton.create("INIT");
+    }
+
+    @Bean
+    public MessengerSettings messengerSettings(Greeting greeting) {
+        return MessengerSettings.create(of(startButton()), of(greeting), empty(),
+                empty(), empty(), empty(), empty());
     }
 
 /*    @Bean

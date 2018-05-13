@@ -1,24 +1,37 @@
 package com.adapters.outgoing.facebook;
 
-import com.github.messenger4j.exceptions.MessengerApiException;
-import com.github.messenger4j.exceptions.MessengerIOException;
-import com.github.messenger4j.send.*;
+import com.github.messenger4j.Messenger;
+import com.github.messenger4j.exception.MessengerApiException;
+import com.github.messenger4j.exception.MessengerIOException;
+import com.github.messenger4j.send.MessagePayload;
+import com.github.messenger4j.send.MessagingType;
+import com.github.messenger4j.send.NotificationType;
+import com.github.messenger4j.send.SenderActionPayload;
+import com.github.messenger4j.send.message.TextMessage;
+import com.github.messenger4j.send.message.quickreply.QuickReply;
+import com.github.messenger4j.send.message.quickreply.TextQuickReply;
+import com.github.messenger4j.send.recipient.IdRecipient;
+import com.github.messenger4j.send.senderaction.SenderAction;
 import com.polafacebook.ports.outgoing.OnNewOutgoingMessageListener;
 import com.polafacebook.process.engine.message.Action;
 import com.polafacebook.process.engine.message.OutgoingMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import static java.util.Optional.empty;
+import static java.util.Optional.of;
+
 public class FacebookMessageSender implements OnNewOutgoingMessageListener {
     private static final Logger logger = LoggerFactory.getLogger(FacebookMessageSender.class);
-    private final MessengerSendClient sendClient;
+    private final Messenger messenger;
     private final TextSplitter splitter;
 
-    public FacebookMessageSender(MessengerSendClient sendClient) {
-        this.sendClient = sendClient;
+    public FacebookMessageSender(Messenger messenger) {
+        this.messenger = messenger;
         this.splitter = new TextSplitter(320);
     }
 
@@ -26,24 +39,28 @@ public class FacebookMessageSender implements OnNewOutgoingMessageListener {
         logger.debug("SendTextMessage: " + recipientId + ":" + text);
 
         try {
-            final Recipient recipient = Recipient.newBuilder().recipientId(recipientId).build();
+            final IdRecipient recipient = IdRecipient.create(recipientId);
             final NotificationType notificationType = NotificationType.REGULAR;
-            final String metadata = "DEVELOPER_DEFINED_METADATA";
 
             Iterator<String> iterator = splitter.split(text).iterator();
 
             while (iterator.hasNext()) {
-                this.sendClient.sendSenderAction(recipient, NotificationType.NO_PUSH, SenderAction.TYPING_ON);
-                String msg = iterator.next();
+                this.sendAction(recipientId, Action.TYPING_ON);
+                String textPart = iterator.next();
+
+                final TextMessage textMessage = TextMessage.create(textPart);
+                final MessagePayload messagePayload = MessagePayload.create(recipient, MessagingType.RESPONSE, textMessage);
 
                 if (iterator.hasNext()) {
-                    this.sendClient.sendTextMessage(recipient, notificationType, msg, metadata);
+                    this.messenger.send(messagePayload);
                 } else if (quickReplies != null) {
-                    this.sendClient.sendTextMessage(recipient, notificationType, msg, quickReplies, metadata);
+                    final TextMessage textMessageWithQuickReplies = TextMessage.create(textPart, of(quickReplies), empty());
+                    final MessagePayload messagePayloadWithQuickReplies = MessagePayload.create(recipient, MessagingType.RESPONSE, textMessageWithQuickReplies);
+                    this.messenger.send(messagePayloadWithQuickReplies);
                 } else {
-                    this.sendClient.sendTextMessage(recipient, notificationType, msg, metadata);
+                    this.messenger.send(messagePayload);
                 }
-                //this.sendClient.sendSenderAction(recipient, NotificationType.NO_PUSH, SenderAction.TYPING_OFF);
+
             }
         } catch (MessengerApiException | MessengerIOException e) {
             handleSendException(e);
@@ -51,17 +68,14 @@ public class FacebookMessageSender implements OnNewOutgoingMessageListener {
     }
 
     private void sendWithQuickReplies(OutgoingMessage fromEngineMessage) {
-        List<QuickReply> quickReplies;
-        QuickReply.ListBuilder listBuilder = com.github.messenger4j.send.QuickReply.newListBuilder();
+        List<QuickReply> quickReplies = new ArrayList<>();
 
         for (com.polafacebook.process.engine.message.QuickReply quickReply : fromEngineMessage.getQuickReplies()) {
-            listBuilder.addTextQuickReply(quickReply.title, quickReply.value).toList();
+            quickReplies.add(TextQuickReply.create(quickReply.title, quickReply.value));
         }
 
-        quickReplies = listBuilder.build();
-
-        String text = fromEngineMessage.getText();
-        String recipientId = fromEngineMessage.getRecipientId();
+        final String text = fromEngineMessage.getText();
+        final String recipientId = fromEngineMessage.getRecipientId();
 
         this.sendTextMessage(recipientId, text, quickReplies);
     }
@@ -91,7 +105,7 @@ public class FacebookMessageSender implements OnNewOutgoingMessageListener {
 
     private void sendAction(String recipientId, Action action) {
         try {
-            this.sendClient.sendSenderAction(recipientId, SenderAction.valueOf(action.toString()));
+            this.messenger.send(SenderActionPayload.create(recipientId, SenderAction.TYPING_ON));
         } catch (MessengerApiException | MessengerIOException e) {
             handleSendException(e);
         }
