@@ -1,19 +1,19 @@
-package com.adapters.dto;
+package com.adapters.outgoing.redis.converters;
 
-import com.polafacebook.process.service.polapi.Result;
+import com.domain.ports.outgoing.productinformation.ProductInformation;
 
 import java.util.ArrayList;
 
 public class ContextEntity {
 
     public String userId;
-    //public Message lastMessage;
+
     public String description;
     public String state;
 
     public ArrayList<AttachmentEntity> attachments = new ArrayList<>();
     public String eanCode;
-    public Result result;
+    public ProductInformation productInformation;
 
     public String lastText;
     public AttachmentEntity lastAttachment;
@@ -30,7 +30,7 @@ public class ContextEntity {
                 ", state='" + state + '\'' +
                 ", attachments=" + attachments +
                 ", eanCode='" + eanCode + '\'' +
-                ", result=" + result +
+                ", polaResult=" + productInformation +
                 ", lastText='" + lastText + '\'' +
                 ", lastAttachment=" + lastAttachment +
                 '}';

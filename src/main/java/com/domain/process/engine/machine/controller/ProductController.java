@@ -14,8 +14,8 @@ import com.domain.process.service.BarCodeService;
 import java.io.IOException;
 
 public class ProductController {
-    public static final char CHR_CHECK_MARK = (char) 0x2713;
-    public static final char CHR_EX_MARK = (char) 0x2717;
+    public static final char CHR_CHECK_MARK = (char) 0x2611;
+    public static final char CHR_NO_MARK = (char) 0x2610;
 
     private final OnNewOutgoingMessageListener listener;
     private BarCodeService barCodeService;
@@ -75,10 +75,10 @@ public class ProductController {
         sb.append(BotResponses.ProductController.onDisplayResults.ratingText).append(context.getProductInformation().getRating()).append("/100").append("\n");
         sb.append(BotResponses.ProductController.onDisplayResults.manufacturerText).append(context.getProductInformation().getName()).append("\n");
         sb.append(BotResponses.ProductController.onDisplayResults.polishCapitaltext).append(context.getProductInformation().getPolishCapitalPercentage()).append("%\n");
-        sb.append(context.getProductInformation().getHiresInPoland().equals(Boolean.TRUE) ? CHR_CHECK_MARK : CHR_EX_MARK).append(" " + BotResponses.ProductController.onDisplayResults.manufacturesInPolandText + "\n");
-        sb.append(context.getProductInformation().getRndInPoland().equals(Boolean.TRUE) ? CHR_CHECK_MARK : CHR_EX_MARK).append(" " + BotResponses.ProductController.onDisplayResults.hasRndInPolandText + "\n");
-        sb.append(context.getProductInformation().getRegisteredInPoland().equals(Boolean.TRUE) ? CHR_CHECK_MARK : CHR_EX_MARK).append(" " + BotResponses.ProductController.onDisplayResults.isRegisteredInPolandText + "\n");
-        sb.append(context.getProductInformation().getPartOfGlobalCorporation().equals(Boolean.TRUE) ? CHR_CHECK_MARK : CHR_EX_MARK).append(" " + BotResponses.ProductController.onDisplayResults.isPartOfForeignCorporationText + "\n");
+        sb.append(context.getProductInformation().getHiresInPoland().equals(Boolean.TRUE) ? CHR_CHECK_MARK : CHR_NO_MARK).append(" " + BotResponses.ProductController.onDisplayResults.manufacturesInPolandText + "\n");
+        sb.append(context.getProductInformation().getRndInPoland().equals(Boolean.TRUE) ? CHR_CHECK_MARK : CHR_NO_MARK).append(" " + BotResponses.ProductController.onDisplayResults.hasRndInPolandText + "\n");
+        sb.append(context.getProductInformation().getRegisteredInPoland().equals(Boolean.TRUE) ? CHR_CHECK_MARK : CHR_NO_MARK).append(" " + BotResponses.ProductController.onDisplayResults.isRegisteredInPolandText + "\n");
+        sb.append(context.getProductInformation().getPartOfGlobalCorporation().equals(Boolean.TRUE) ? CHR_CHECK_MARK : CHR_NO_MARK).append(" " + BotResponses.ProductController.onDisplayResults.isPartOfForeignCorporationText + "\n");
 
         sb.append(context.getProductInformation().getDescription());
 

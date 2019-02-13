@@ -1,4 +1,4 @@
-package com.adapters.dto;
+package com.adapters.outgoing.redis.converters;
 
 public class AttachmentEntity {
     public String url;

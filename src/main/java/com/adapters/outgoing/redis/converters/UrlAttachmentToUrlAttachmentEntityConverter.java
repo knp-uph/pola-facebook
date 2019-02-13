@@ -1,7 +1,6 @@
-package com.adapters.dto.converters;
+package com.adapters.outgoing.redis.converters;
 
-import com.adapters.dto.AttachmentEntity;
-import com.polafacebook.process.engine.message.attachment.UrlAttachment;
+import com.domain.process.engine.message.attachment.UrlAttachment;
 
 public class UrlAttachmentToUrlAttachmentEntityConverter {
     public AttachmentEntity produceAttachmentEntity(UrlAttachment attachment) {

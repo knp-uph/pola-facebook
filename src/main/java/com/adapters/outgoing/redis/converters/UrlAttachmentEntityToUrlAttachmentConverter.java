@@ -1,8 +1,7 @@
-package com.adapters.dto.converters;
+package com.adapters.outgoing.redis.converters;
 
-import com.adapters.dto.AttachmentEntity;
-import com.polafacebook.process.engine.message.attachment.Attachment;
-import com.polafacebook.process.engine.message.attachment.UrlAttachment;
+import com.domain.process.engine.message.attachment.Attachment;
+import com.domain.process.engine.message.attachment.UrlAttachment;
 
 import java.net.MalformedURLException;
 import java.net.URL;
