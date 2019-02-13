@@ -1,9 +1,9 @@
 package com.adapters.incoming.console.converters;
 
 import com.adapters.incoming.console.SpecialArgumentParser;
-import com.polafacebook.process.engine.message.IncomingMessage;
-import com.polafacebook.process.engine.message.attachment.Attachment;
-import com.polafacebook.process.engine.message.attachment.FileAttachment;
+import com.domain.process.engine.message.IncomingMessage;
+import com.domain.process.engine.message.attachment.Attachment;
+import com.domain.process.engine.message.attachment.FileAttachment;
 
 import java.util.Map;
 

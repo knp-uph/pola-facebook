@@ -1,5 +1,8 @@
 package com.adapters.outgoing.facebook;
 
+import com.domain.ports.outgoing.communicator.OnNewOutgoingMessageListener;
+import com.domain.process.engine.message.Action;
+import com.domain.process.engine.message.OutgoingMessage;
 import com.github.messenger4j.Messenger;
 import com.github.messenger4j.exception.MessengerApiException;
 import com.github.messenger4j.exception.MessengerIOException;
@@ -12,9 +15,6 @@ import com.github.messenger4j.send.message.quickreply.QuickReply;
 import com.github.messenger4j.send.message.quickreply.TextQuickReply;
 import com.github.messenger4j.send.recipient.IdRecipient;
 import com.github.messenger4j.send.senderaction.SenderAction;
-import com.polafacebook.ports.outgoing.OnNewOutgoingMessageListener;
-import com.polafacebook.process.engine.message.Action;
-import com.polafacebook.process.engine.message.OutgoingMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +70,7 @@ public class FacebookMessageSender implements OnNewOutgoingMessageListener {
     private void sendWithQuickReplies(OutgoingMessage fromEngineMessage) {
         List<QuickReply> quickReplies = new ArrayList<>();
 
-        for (com.polafacebook.process.engine.message.QuickReply quickReply : fromEngineMessage.getQuickReplies()) {
+        for (com.domain.process.engine.message.QuickReply quickReply : fromEngineMessage.getQuickReplies()) {
             quickReplies.add(TextQuickReply.create(quickReply.title, quickReply.value));
         }
 

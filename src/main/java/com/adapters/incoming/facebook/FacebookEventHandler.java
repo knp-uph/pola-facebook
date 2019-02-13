@@ -1,5 +1,8 @@
 package com.adapters.incoming.facebook;
 
+import com.domain.process.engine.ConversationEngine;
+import com.domain.process.engine.message.IncomingMessage;
+import com.domain.process.engine.message.attachment.UrlAttachment;
 import com.github.messenger4j.Messenger;
 import com.github.messenger4j.exception.MessengerApiException;
 import com.github.messenger4j.exception.MessengerIOException;
@@ -12,9 +15,6 @@ import com.github.messenger4j.webhook.event.QuickReplyMessageEvent;
 import com.github.messenger4j.webhook.event.TextMessageEvent;
 import com.github.messenger4j.webhook.event.attachment.Attachment;
 import com.github.messenger4j.webhook.event.attachment.RichMediaAttachment;
-import com.polafacebook.process.engine.ConversationEngine;
-import com.polafacebook.process.engine.message.IncomingMessage;
-import com.polafacebook.process.engine.message.attachment.UrlAttachment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +22,7 @@ import java.net.URL;
 import java.time.Instant;
 import java.util.List;
 
-import static com.polafacebook.process.engine.message.attachment.Attachment.Type.IMAGE;
+import static com.domain.process.engine.message.attachment.Attachment.Type.IMAGE;
 
 /**
  * Created by Piotr on 23.09.2017.

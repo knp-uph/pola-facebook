@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
-Main-Class: com.polafacebook.PolaFacebookApplication
+Main-Class: com.domain.PolaFacebookApplication
 

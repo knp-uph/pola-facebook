@@ -5,7 +5,7 @@
 
     <groupId>com.polafacebook</groupId>
     <artifactId>polafacebook</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.4-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>polafacebook</name>
@@ -50,7 +50,13 @@
         <dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>core</artifactId>
-            <version>3.3.0</version>
+            <version>3.3.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>javase</artifactId>
+            <version>3.3.3</version>
         </dependency>
 
         <dependency>
@@ -91,9 +97,8 @@
         <dependency>
             <groupId>com.github.messenger4j</groupId>
             <artifactId>messenger4j</artifactId>
-            <version>1.0.0-M3</version>
+            <version>1.0.0</version>
         </dependency>
-
 
     </dependencies>
 
