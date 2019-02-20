@@ -3,7 +3,7 @@ package com.domain.process.engine.machine.controller;
 
 import com.domain.BotResponses;
 import com.domain.ports.outgoing.communicator.OnNewOutgoingMessageListener;
-import com.domain.process.engine.ConversationEngine;
+import com.domain.process.engine.AbstractEngine;
 import com.domain.process.engine.message.OutgoingMessage;
 import io.sentry.Sentry;
 import org.slf4j.Logger;
@@ -19,9 +19,9 @@ public class ControllerExceptionHandler {
 
     private final OnNewOutgoingMessageListener listener;
 
-    private ConversationEngine conversationEngine;
+    private AbstractEngine conversationEngine;
 
-    public ControllerExceptionHandler(OnNewOutgoingMessageListener listener, ConversationEngine conversationEngine) {
+    public ControllerExceptionHandler(OnNewOutgoingMessageListener listener, AbstractEngine conversationEngine) {
         this.listener = listener;
         this.conversationEngine = conversationEngine;
         Sentry.init();
@@ -37,7 +37,7 @@ public class ControllerExceptionHandler {
             logger.error("Failed to reset conversation state.", internalError);
         }
 
-        String id = conversationEngine.getCurrentId();
+        String id = conversationEngine.getCurrentUserId();
 
         OutgoingMessage outgoingMessage = new OutgoingMessage(BotResponses.ControllerExceptionHandler.text, id);
         outgoingMessage.addQuickReply(BotResponses.ControllerExceptionHandler.quickReply, "INIT");

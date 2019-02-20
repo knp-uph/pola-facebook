@@ -32,7 +32,7 @@ public class ConversationEngine extends AbstractEngine {
     /**
      * id of the user who is currently being served.
      */
-    private String currentId;
+    private String currentUserId;
 
     public ConversationEngine (
             ContextManager contextRepository,
@@ -48,17 +48,17 @@ public class ConversationEngine extends AbstractEngine {
         logger.debug("Created Conversation Engine");
     }
 
-    public String getCurrentId() {
-        return currentId;
+    @Override
+    public String getCurrentUserId() {
+        return currentUserId;
     }
 
-    /**
-     * Resets state of the current conversation, so it can be cleaned and started anew.
-     */
-    public boolean resetState() {
-        logger.debug("Clearing context for user " + currentId);
 
-        return contextRepositoryManager.deleteContext(currentId);
+    @Override
+    public void resetState() {
+        logger.debug("Clearing context for user " + currentUserId);
+
+        contextRepositoryManager.deleteContext(currentUserId);
     }
 
     @Override
@@ -66,24 +66,18 @@ public class ConversationEngine extends AbstractEngine {
         return featureConfiguration;
     }
 
-    /**
-     * Prompts the conversation engine to respond to stimuli.
-     *
-     * @param incomingMessage
-     * @return
-     */
     @Override
     public void onNewMessage(IncomingMessage incomingMessage) {
         logger.debug(incomingMessage.toString());
 
-        currentId = incomingMessage.getSenderId();
+        currentUserId = incomingMessage.getSenderId();
 
         if (incomingMessage.hasPayload() && incomingMessage.getPayload().equals("INIT")) {
             resetState();
         }
 
         MachineState to = null;
-        Context context = contextRepositoryManager.getOrCreateContext(currentId);
+        Context context = contextRepositoryManager.getOrCreateContext(currentUserId);
 
         logger.debug("Context: {}" , context);
 

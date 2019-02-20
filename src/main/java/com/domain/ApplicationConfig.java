@@ -1,15 +1,14 @@
 package com.domain;
 
-import com.adapters.incoming.facebook.FacebookEventHandler;
 import com.adapters.incoming.facebook.Messenger4jConfiguration;
 import com.adapters.outgoing.facebook.FacebookMessageSender;
 import com.adapters.outgoing.pola.PolaConfiguration;
 import com.adapters.outgoing.redis.RedisConfiguration;
 import com.domain.ports.incoming.communicator.FeatureConfiguration;
-import com.domain.ports.incoming.communicator.OnNewIncomingMessageListener;
 import com.domain.ports.outgoing.communicator.OnNewOutgoingMessageListener;
 import com.domain.ports.outgoing.context.ContextManager;
 import com.domain.ports.outgoing.productinformation.ProductInformationService;
+import com.domain.process.engine.AbstractEngine;
 import com.domain.process.engine.ConversationEngine;
 import com.domain.process.engine.machine.Flow;
 import com.domain.process.engine.machine.MachineState;
@@ -85,7 +84,7 @@ public class ApplicationConfig {
     }
 
     @Bean
-    ConversationEngine conversationEngine(
+    AbstractEngine abstractEngine(
             FeatureConfiguration featureConfiguration,
             ContextManager contextRepository,
             @Qualifier("dispatchers") HashMap<MachineState, StateDispatcher> dispatchers,
@@ -94,21 +93,8 @@ public class ApplicationConfig {
     }
 
     @Bean
-    OnNewIncomingMessageListener onNewIncomingMessageListener(FeatureConfiguration featureConfiguration,
-                                                              ContextManager contextRepository,
-                                                              @Qualifier("dispatchers") HashMap<MachineState, StateDispatcher> dispatchers,
-                                                              Flow machineFlow) {
-        return new ConversationEngine(contextRepository, featureConfiguration, dispatchers, machineFlow);
-    }
-
-    @Bean
-    public FacebookEventHandler facebookEventHandler(ConversationEngine conversationEngine, Messenger messenger) {
-        return new FacebookEventHandler(conversationEngine, messenger);
-    }
-
-    @Bean
-    public ControllerExceptionHandler controllerExceptionHandler(OnNewOutgoingMessageListener onNewOutgoingMessageListener, ConversationEngine conversationEngine) {
-        return new ControllerExceptionHandler(onNewOutgoingMessageListener, conversationEngine);
+    public ControllerExceptionHandler controllerExceptionHandler(OnNewOutgoingMessageListener onNewOutgoingMessageListener, AbstractEngine abstractEngine) {
+        return new ControllerExceptionHandler(onNewOutgoingMessageListener, abstractEngine);
     }
 
 }

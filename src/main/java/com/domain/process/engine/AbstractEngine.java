@@ -11,5 +11,18 @@ public abstract class AbstractEngine implements OnNewIncomingMessageListener {
         this.context = context;
     }
 
+    /**
+     * Prompts the conversation engine to respond to stimuli.
+     *
+     * @param incomingMessage
+     * @return
+     */
     public abstract void onNewMessage(IncomingMessage incomingMessage);
+
+    /**
+     * Resets state of the current conversation, so it can be cleaned and started anew.
+     */
+    public abstract void resetState();
+
+    public abstract String getCurrentUserId();
 }
