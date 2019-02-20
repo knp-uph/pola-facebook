@@ -1,10 +1,13 @@
 package com.adapters.incoming.facebook;
 
+import com.domain.ApplicationConfig;
 import com.domain.ports.incoming.communicator.OnNewIncomingMessageListener;
 import com.github.messenger4j.Messenger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
+@Import({ApplicationConfig.class})
 @Configuration
 public class Messenger4jConfiguration {
 
@@ -17,4 +20,5 @@ public class Messenger4jConfiguration {
     public FacebookEventHandler facebookEventHandler(OnNewIncomingMessageListener onNewIncomingMessageListener, Messenger messenger) {
         return new FacebookEventHandler(onNewIncomingMessageListener, messenger);
     }
+
 }

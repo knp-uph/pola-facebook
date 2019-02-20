@@ -1,6 +1,5 @@
 package com.domain;
 
-import com.adapters.incoming.facebook.Messenger4jConfiguration;
 import com.adapters.outgoing.facebook.FacebookMessageSender;
 import com.adapters.outgoing.pola.PolaConfiguration;
 import com.adapters.outgoing.redis.RedisConfiguration;
@@ -34,7 +33,7 @@ import java.util.HashMap;
 import static com.domain.process.engine.machine.MachineState.*;
 
 
-@Import({PolaConfiguration.class, RedisConfiguration.class, Messenger4jConfiguration.class})
+@Import({PolaConfiguration.class, RedisConfiguration.class})
 @Configuration
 public class ApplicationConfig {
 

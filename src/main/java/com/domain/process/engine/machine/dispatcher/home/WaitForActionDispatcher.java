@@ -15,7 +15,7 @@ public class WaitForActionDispatcher implements StateDispatcher {
 
     @Override
     public MachineState dispatch(Context context, IncomingMessage message) {
-        context = context.getCleanContext();
+        context.clear();
 
         String text = message.getText().toUpperCase();
         if (text.contains("METODYKA") || text.contains("METODOLOGIA")) {
@@ -30,7 +30,7 @@ public class WaitForActionDispatcher implements StateDispatcher {
         if (message.hasAttachments()) {
             return MachineState.PROCESS_IMAGE;
         }
-        //TODO: multi-code support?
+
         String[] codes = dispatcherHelper.extractCode(message);
         if (codes.length > 0) {
             context.setEanCode(codes[0]);

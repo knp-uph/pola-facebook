@@ -29,12 +29,15 @@ public class Context {
     }
 
     /**
-     * Use this to get a clean context containing only vital context data.
-     *
-     * @return
+     * Use this to purge non-vital information in context object. Only userId and state are preserved.
      */
-    public Context getCleanContext() {
-        return new Context(this.getUserId(), this.getState());
+    public void clear() {
+        description = null;
+        attachments = new ArrayList<>();
+        eanCode = null;
+        productInformation = null;
+        lastText = null;
+        lastAttachment = null;
     }
 
     @Override

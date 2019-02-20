@@ -25,6 +25,9 @@ public class ProductInformation {
         this.description = description;
     }
 
+    public ProductInformation() {
+    }
+
     public int getProductId() {
         return productId;
     }

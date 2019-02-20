@@ -40,7 +40,7 @@ public class ControllerExceptionHandler {
         String id = conversationEngine.getCurrentUserId();
 
         OutgoingMessage outgoingMessage = new OutgoingMessage(BotResponses.ControllerExceptionHandler.text, id);
-        outgoingMessage.addQuickReply(BotResponses.ControllerExceptionHandler.quickReply, "INIT");
+        outgoingMessage.addQuickReply(BotResponses.ControllerExceptionHandler.quickReply, conversationEngine.getFeatureConfiguration().getInitializationPayload());
 
         listener.onNewMessage(outgoingMessage);
         logger.debug("Error message dispatched.");

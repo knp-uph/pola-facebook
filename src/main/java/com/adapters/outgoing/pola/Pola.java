@@ -230,8 +230,8 @@ class Pola {
 
     public static void main(String... args) throws IOException {
         Pola P = new Pola("https://www.pola-app.pl/a/v2/");
-        //System.out.println(P.getByCode("5906441211478"));
-        //System.out.println(P.getByCode("1234567890123"));
+        System.out.println(P.getByCode("5906441211478", "test"));
+        //System.out.println(P.getByCode("1234567890123", "test"));
         System.out.println(P.createReport()
                 .setDescription("test")
                 .setDeviceId("test")
@@ -239,6 +239,6 @@ class Pola {
                 .setMimeType("image/png")
                 .setFileExtension("png")
                 .addFileFromUrl(new URL("https://scontent-iad3-1.xx.fbcdn.net/v/t39.1997-6/851557_369239266556155_759568595_n.png?_nc_cat=0&_nc_ad=z-m&_nc_cid=0&oh=077377daae3942a4ec47da063d057ae0&oe=5B8AF8DC"))
-                .send());
+        );//.send());
     }
 }

@@ -66,7 +66,7 @@ public class FacebookEventHandler {
     public void onTextMessageEvent(TextMessageEvent event) {
         final Instant timestamp = event.timestamp();
         if (this.hasBeenServed(timestamp)) {
-            logger.debug("Discarding a duplicate event: " + event.messageId() + " with timestamp " + event.timestamp(), event);
+            logger.debug("Discarding duplicate event: " + event.messageId() + " with timestamp " + event.timestamp(), event);
             return;
         }
 

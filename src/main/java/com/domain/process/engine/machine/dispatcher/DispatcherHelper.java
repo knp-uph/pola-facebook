@@ -139,7 +139,7 @@ public class DispatcherHelper {
         text = "1234567890123, 1234567890123, 1234567 890123";
         //text = "1234567 890123";
         String[] results = dispatcherHelper.extractCode(new IncomingMessage(text, "DEV"));
-        System.out.println("PolaResult: " + results.length);
+        System.out.println("Matched times: " + results.length);
         for (String m : results) {
             System.out.println("Code found: " + m);
         }

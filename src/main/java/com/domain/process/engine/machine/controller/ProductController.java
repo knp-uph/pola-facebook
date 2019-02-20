@@ -1,6 +1,5 @@
 package com.domain.process.engine.machine.controller;
 
-import com.adapters.outgoing.pola.PolaService;
 import com.domain.BotResponses;
 import com.domain.ports.outgoing.communicator.OnNewOutgoingMessageListener;
 import com.domain.ports.outgoing.context.Context;
@@ -24,14 +23,6 @@ public class ProductController {
     public ProductController(OnNewOutgoingMessageListener listener, BarCodeService barCodeService, ProductInformationService polaService) {
         this.listener = listener;
         this.barCodeService = barCodeService;
-        this.polaService = polaService;
-    }
-
-    public void setBarCodeService(BarCodeService barCodeService) {
-        this.barCodeService = barCodeService;
-    }
-
-    public void setPolaService(PolaService polaService) {
         this.polaService = polaService;
     }
 
