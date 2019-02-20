@@ -5,9 +5,6 @@ import com.domain.process.engine.message.attachment.Attachment;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by Piotr on 24.09.2017.
- */
 public abstract class Message {
     protected String text;
     protected final String payload;

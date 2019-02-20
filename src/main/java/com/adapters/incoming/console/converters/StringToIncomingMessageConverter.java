@@ -1,7 +1,7 @@
 package com.adapters.incoming.console.converters;
 
 import com.adapters.incoming.console.SpecialArgumentParser;
-import com.domain.process.engine.message.IncomingMessage;
+import com.domain.ports.incoming.communicator.IncomingMessage;
 import com.domain.process.engine.message.attachment.Attachment;
 import com.domain.process.engine.message.attachment.FileAttachment;
 

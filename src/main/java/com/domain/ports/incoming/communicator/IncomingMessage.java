@@ -1,8 +1,7 @@
-package com.domain.process.engine.message;
+package com.domain.ports.incoming.communicator;
 
-/**
- * Created by Piotr on 23.09.2017.
- */
+import com.domain.process.engine.message.Message;
+
 public class IncomingMessage extends Message {
     private String senderId;
 

@@ -26,7 +26,7 @@ public class Main {
             } else {
                 IncomingMessage in = toIncomingMessage.produceIncomingMessage(line);
                 System.out.println(in);
-                engine.doAction(in);
+                engine.onNewMessage(in);
             }
 
             System.out.print(">");

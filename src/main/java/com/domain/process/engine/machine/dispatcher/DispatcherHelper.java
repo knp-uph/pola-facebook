@@ -1,6 +1,6 @@
 package com.domain.process.engine.machine.dispatcher;
 
-import com.domain.process.engine.message.IncomingMessage;
+import com.domain.ports.incoming.communicator.IncomingMessage;
 import com.domain.process.engine.message.attachment.Attachment;
 
 import java.util.ArrayList;

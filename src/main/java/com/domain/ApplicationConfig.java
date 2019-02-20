@@ -5,6 +5,8 @@ import com.adapters.incoming.facebook.Messenger4jConfiguration;
 import com.adapters.outgoing.facebook.FacebookMessageSender;
 import com.adapters.outgoing.pola.PolaConfiguration;
 import com.adapters.outgoing.redis.RedisConfiguration;
+import com.domain.ports.incoming.communicator.FeatureConfiguration;
+import com.domain.ports.incoming.communicator.OnNewIncomingMessageListener;
 import com.domain.ports.outgoing.communicator.OnNewOutgoingMessageListener;
 import com.domain.ports.outgoing.context.ContextManager;
 import com.domain.ports.outgoing.productinformation.ProductInformationService;
@@ -36,6 +38,11 @@ import static com.domain.process.engine.machine.MachineState.*;
 @Import({PolaConfiguration.class, RedisConfiguration.class, Messenger4jConfiguration.class})
 @Configuration
 public class ApplicationConfig {
+
+    @Bean
+    public FeatureConfiguration featureConfiguration() {
+        return new FeatureConfiguration("INIT", BotResponses.Setup.greetingText);
+    }
 
     @Bean
     public BarCodeService barCodeService() {
@@ -79,11 +86,19 @@ public class ApplicationConfig {
 
     @Bean
     ConversationEngine conversationEngine(
+            FeatureConfiguration featureConfiguration,
             ContextManager contextRepository,
             @Qualifier("dispatchers") HashMap<MachineState, StateDispatcher> dispatchers,
-            OnNewOutgoingMessageListener outgoingMessageListener,
             Flow machineFlow) {
-        return new ConversationEngine(contextRepository, dispatchers, outgoingMessageListener, machineFlow);
+        return new ConversationEngine(contextRepository, featureConfiguration, dispatchers, machineFlow);
+    }
+
+    @Bean
+    OnNewIncomingMessageListener onNewIncomingMessageListener(FeatureConfiguration featureConfiguration,
+                                                              ContextManager contextRepository,
+                                                              @Qualifier("dispatchers") HashMap<MachineState, StateDispatcher> dispatchers,
+                                                              Flow machineFlow) {
+        return new ConversationEngine(contextRepository, featureConfiguration, dispatchers, machineFlow);
     }
 
     @Bean

@@ -1,10 +1,16 @@
 package com.adapters.incoming.facebook;
 
+import com.domain.ports.incoming.communicator.FeatureConfiguration;
+import com.domain.ports.incoming.communicator.OnNewIncomingMessageListener;
 import com.github.messenger4j.Messenger;
+import com.github.messenger4j.common.SupportedLocale;
 import com.github.messenger4j.exception.MessengerApiException;
 import com.github.messenger4j.exception.MessengerIOException;
 import com.github.messenger4j.exception.MessengerVerificationException;
 import com.github.messenger4j.messengerprofile.MessengerSettings;
+import com.github.messenger4j.messengerprofile.getstarted.StartButton;
+import com.github.messenger4j.messengerprofile.greeting.Greeting;
+import com.github.messenger4j.messengerprofile.greeting.LocalizedGreeting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static com.github.messenger4j.Messenger.*;
+import static java.util.Optional.empty;
 import static java.util.Optional.of;
 
 /**
@@ -30,17 +37,26 @@ public class MessengerPlatformCallbackHandler {
 
     private final Messenger messenger;
 
+    private final OnNewIncomingMessageListener conversationEngine;
+
     private final FacebookEventHandler eventHandler;
 
     @Autowired
     public MessengerPlatformCallbackHandler(final Messenger messenger,
-                                            final MessengerSettings messengerSettings,
-                                            final FacebookEventHandler eventHandler
+                                            final FacebookEventHandler eventHandler,
+                                            final OnNewIncomingMessageListener conversationEngine
     ) {
         this.messenger = messenger;
         this.eventHandler = eventHandler;
+        this.conversationEngine = conversationEngine;
         try {
-            messenger.updateSettings(messengerSettings);
+            FeatureConfiguration featureConfiguration = this.conversationEngine.getFeatureConfiguration();
+
+            Greeting greeting = Greeting.create(featureConfiguration.getGreetingText(), LocalizedGreeting.create(SupportedLocale.pl_PL, featureConfiguration.getGreetingText()));
+            StartButton startButton = StartButton.create(featureConfiguration.getGreetingText());
+
+            messenger.updateSettings(MessengerSettings.create(of(startButton), of(greeting), empty(),
+                    empty(), empty(), empty(), empty()));
         } catch (MessengerApiException e) {
             logger.error("Unable to set Messenger settings.", e);
         } catch (MessengerIOException e) {

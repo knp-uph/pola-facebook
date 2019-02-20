@@ -1,7 +1,7 @@
 package com.adapters.incoming.facebook;
 
-import com.domain.process.engine.ConversationEngine;
-import com.domain.process.engine.message.IncomingMessage;
+import com.domain.ports.incoming.communicator.IncomingMessage;
+import com.domain.ports.incoming.communicator.OnNewIncomingMessageListener;
 import com.domain.process.engine.message.attachment.UrlAttachment;
 import com.github.messenger4j.Messenger;
 import com.github.messenger4j.exception.MessengerApiException;
@@ -35,12 +35,12 @@ public class FacebookEventHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(FacebookEventHandler.class);
 
-    private final ConversationEngine conversationEngine;
+    private final OnNewIncomingMessageListener conversationEngine;
     private final Messenger messenger;
 
     private Instant lastTimestampServed = Instant.now();
 
-    public FacebookEventHandler(ConversationEngine conversationEngine, Messenger messenger) {
+    public FacebookEventHandler(OnNewIncomingMessageListener conversationEngine, Messenger messenger) {
         this.conversationEngine = conversationEngine;
         this.messenger = messenger;
     }
@@ -52,7 +52,7 @@ public class FacebookEventHandler {
     }
 
     private void promptEngine(IncomingMessage message) {
-        conversationEngine.doAction(message);
+        conversationEngine.onNewMessage(message);
     }
 
     private void sendMarkSeen(String senderId) {

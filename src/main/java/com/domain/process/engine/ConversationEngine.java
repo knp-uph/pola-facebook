@@ -1,13 +1,13 @@
 package com.domain.process.engine;
 
-import com.domain.ports.outgoing.communicator.OnNewOutgoingMessageListener;
+import com.domain.ports.incoming.communicator.FeatureConfiguration;
+import com.domain.ports.incoming.communicator.IncomingMessage;
 import com.domain.ports.outgoing.context.Context;
 import com.domain.ports.outgoing.context.ContextManager;
 import com.domain.process.engine.machine.Flow;
 import com.domain.process.engine.machine.MachineState;
 import com.domain.process.engine.machine.TransitionListener;
 import com.domain.process.engine.machine.dispatcher.StateDispatcher;
-import com.domain.process.engine.message.IncomingMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -25,27 +25,23 @@ public class ConversationEngine extends AbstractEngine {
     private static final Logger logger = LoggerFactory.getLogger(ConversationEngine.class);
     private ContextManager contextRepositoryManager;
 
-    private HashMap<MachineState, StateDispatcher> dispatchers;
-    private Flow machineFlow;
+    private final FeatureConfiguration featureConfiguration;
+    private final HashMap<MachineState, StateDispatcher> dispatchers;
+    private final Flow machineFlow;
 
     /**
      * id of the user who is currently being served.
      */
     private String currentId;
 
-    /**
-     * this is how other objects can communicate with the engine; the function to the right receives input to the engine
-     */
-    private final OnNewOutgoingMessageListener listener;
-
     public ConversationEngine (
             ContextManager contextRepository,
+            FeatureConfiguration featureConfiguration,
             @Qualifier("dispatchers") HashMap<MachineState, StateDispatcher> dispatchers,
-            OnNewOutgoingMessageListener outgoingMessageListener,
             Flow machineFlow
     ) {
         this.contextRepositoryManager = contextRepository;
-        this.listener = outgoingMessageListener;
+        this.featureConfiguration = featureConfiguration;
         this.dispatchers = dispatchers;
         this.machineFlow = machineFlow;
 
@@ -65,6 +61,11 @@ public class ConversationEngine extends AbstractEngine {
         return contextRepositoryManager.deleteContext(currentId);
     }
 
+    @Override
+    public FeatureConfiguration getFeatureConfiguration() {
+        return featureConfiguration;
+    }
+
     /**
      * Prompts the conversation engine to respond to stimuli.
      *
@@ -72,7 +73,7 @@ public class ConversationEngine extends AbstractEngine {
      * @return
      */
     @Override
-    public void doAction(IncomingMessage incomingMessage) {
+    public void onNewMessage(IncomingMessage incomingMessage) {
         logger.debug(incomingMessage.toString());
 
         currentId = incomingMessage.getSenderId();
@@ -124,5 +125,4 @@ public class ConversationEngine extends AbstractEngine {
         context.setState(to);
         logger.debug("Waiting at: {}, ", context.getState());
     }
-
 }
