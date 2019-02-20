@@ -21,9 +21,8 @@ public class RedisContextManager implements ContextManager {
     }
 
     @Override
-    public boolean saveContext(Context context) {
+    public void saveContext(Context context) {
         redisRepository.save(outgoingConverter.produceRedisContext(context));
-        return true;
     }
 
     @Override
@@ -47,9 +46,8 @@ public class RedisContextManager implements ContextManager {
     }
 
     @Override
-    public boolean deleteContext(String id) {
+    public void deleteContext(String id) {
         redisRepository.delete(id);
-        return false;
     }
 
 }

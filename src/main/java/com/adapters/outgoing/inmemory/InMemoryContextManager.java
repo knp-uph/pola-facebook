@@ -10,8 +10,14 @@ public class InMemoryContextManager implements ContextManager {
     private List<Context> contextList = new ArrayList<>();
 
     @Override
-    public boolean saveContext(Context context) {
-        return true;
+    public void saveContext(Context context) {
+        for (Context c : contextList) {
+            if (c.getUserId().equals(context.getUserId())) {
+                c = context;
+                return;
+            }
+        }
+        contextList.add(context);
     }
 
     @Override
@@ -36,8 +42,7 @@ public class InMemoryContextManager implements ContextManager {
     }
 
     @Override
-    public boolean deleteContext(String currentId) {
+    public void deleteContext(String currentId) {
         contextList.remove(getContext(currentId));
-        return true;
     }
 }

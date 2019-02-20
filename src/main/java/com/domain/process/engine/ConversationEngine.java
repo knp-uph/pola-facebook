@@ -72,7 +72,7 @@ public class ConversationEngine extends AbstractEngine {
 
         currentUserId = incomingMessage.getSenderId();
 
-        if (incomingMessage.hasPayload() && incomingMessage.getPayload().equals("INIT")) {
+        if (incomingMessage.hasPayload() && incomingMessage.getPayload().equals(featureConfiguration.getInitializationPayload())) {
             resetState();
         }
 
