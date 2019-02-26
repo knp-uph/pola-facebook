@@ -9,7 +9,7 @@ import javax.annotation.PostConstruct;
 import java.util.concurrent.TimeUnit;
 
 @Repository
-public class RedisRepository {
+class RedisRepository {
 
     private RedisTemplate<String, ContextEntity> redisTemplate;
     private ValueOperations<String, ContextEntity> valueOperations;

@@ -1,10 +1,11 @@
 package com.domain.process.engine;
 
+import com.domain.ports.incoming.communicator.CommunicatorConfigurationProvider;
 import com.domain.ports.incoming.communicator.FeatureConfiguration;
 import com.domain.ports.incoming.communicator.IncomingMessage;
 import com.domain.ports.outgoing.context.Context;
 import com.domain.ports.outgoing.context.ContextManager;
-import com.domain.process.engine.machine.Flow;
+import com.domain.process.engine.machine.MachineFlow;
 import com.domain.process.engine.machine.MachineState;
 import com.domain.process.engine.machine.TransitionListener;
 import com.domain.process.engine.machine.dispatcher.StateDispatcher;
@@ -12,33 +13,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import java.util.HashMap;
-
-import static com.domain.process.engine.machine.MachineState.INIT;
-import static com.domain.process.engine.machine.MachineState.WELCOME;
+import java.util.Map;
 
 /**
  * Created by Piotr on 07.08.2017.
  */
-public class ConversationEngine extends AbstractEngine {
+public class ConversationEngine extends AbstractEngine implements CommunicatorConfigurationProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(ConversationEngine.class);
     private ContextManager contextRepositoryManager;
 
     private final FeatureConfiguration featureConfiguration;
-    private final HashMap<MachineState, StateDispatcher> dispatchers;
-    private final Flow machineFlow;
+    private final Map<MachineState, StateDispatcher> dispatchers;
+    private final MachineFlow machineFlow;
 
     /**
      * id of the user who is currently being served.
      */
     private String currentUserId;
 
-    public ConversationEngine (
+    public ConversationEngine(
             ContextManager contextRepository,
             FeatureConfiguration featureConfiguration,
-            @Qualifier("dispatchers") HashMap<MachineState, StateDispatcher> dispatchers,
-            Flow machineFlow
+            @Qualifier("dispatchers") Map<MachineState, StateDispatcher> dispatchers,
+            MachineFlow machineFlow
     ) {
         this.contextRepositoryManager = contextRepository;
         this.featureConfiguration = featureConfiguration;
@@ -79,20 +77,15 @@ public class ConversationEngine extends AbstractEngine {
         MachineState to = null;
         Context context = contextRepositoryManager.getOrCreateContext(currentUserId);
 
-        logger.debug("Context: {}" , context);
+        logger.debug("Context: {}", context);
 
         context.setLastText(incomingMessage.getText());
         context.setLastAttachment(incomingMessage.getAttachment(0));
 
-        if (context.getState() == INIT) {
-            to = WELCOME;
-            logger.debug("{} => {}", context.getState(), to);
-        } else {
-            StateDispatcher stateDispatcher = dispatchers.get(context.getState());
-            if (stateDispatcher != null) {
-                to = stateDispatcher.dispatch(context, incomingMessage);
-                logger.debug("DISPATCH: {} => {}", context.getState(), to);
-            }
+        StateDispatcher stateDispatcher = dispatchers.get(context.getState());
+        if (stateDispatcher != null) {
+            to = stateDispatcher.dispatch(context, incomingMessage);
+            logger.debug("DISPATCH: {} => {}", context.getState(), to);
         }
 
         processIntermediateStates(context, to);

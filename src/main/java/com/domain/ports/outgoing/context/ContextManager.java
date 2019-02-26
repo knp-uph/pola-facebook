@@ -5,5 +5,5 @@ public interface ContextManager {
     public Context getContext(String id);
     public Context getOrCreateContext(String id);
 
-    public void deleteContext(String currentId);
+    public void deleteContext(String id);
 }

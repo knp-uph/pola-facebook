@@ -2,9 +2,9 @@ package com.domain.process.engine.machine.controller;
 
 import com.domain.BotResponses;
 import com.domain.ports.outgoing.communicator.OnNewOutgoingMessageListener;
+import com.domain.ports.outgoing.communicator.OutgoingMessage;
 import com.domain.ports.outgoing.context.Context;
 import com.domain.process.engine.machine.MachineState;
-import com.domain.process.engine.message.OutgoingMessage;
 
 public class InfoController {
     private final OnNewOutgoingMessageListener listener;

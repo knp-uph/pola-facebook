@@ -1,6 +1,6 @@
 package com.adapters.outgoing.redis.converters;
 
-import com.domain.process.engine.message.attachment.UrlAttachment;
+import com.domain.ports.dto.UrlAttachment;
 
 public class UrlAttachmentToUrlAttachmentEntityConverter {
     public AttachmentEntity produceAttachmentEntity(UrlAttachment attachment) {

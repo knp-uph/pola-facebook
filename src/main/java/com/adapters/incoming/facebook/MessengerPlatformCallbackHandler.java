@@ -1,7 +1,7 @@
 package com.adapters.incoming.facebook;
 
+import com.domain.ports.incoming.communicator.CommunicatorConfigurationProvider;
 import com.domain.ports.incoming.communicator.FeatureConfiguration;
-import com.domain.ports.incoming.communicator.OnNewIncomingMessageListener;
 import com.github.messenger4j.Messenger;
 import com.github.messenger4j.common.SupportedLocale;
 import com.github.messenger4j.exception.MessengerApiException;
@@ -37,23 +37,22 @@ public class MessengerPlatformCallbackHandler {
 
     private final Messenger messenger;
 
-    private final OnNewIncomingMessageListener conversationEngine;
-
     private final FacebookEventHandler eventHandler;
+
+    private final CommunicatorConfigurationProvider communicatorConfigurationProvider;
 
     @Autowired
     public MessengerPlatformCallbackHandler(final Messenger messenger,
                                             final FacebookEventHandler eventHandler,
-                                            final OnNewIncomingMessageListener conversationEngine
-    ) {
+                                            CommunicatorConfigurationProvider communicatorConfigurationProvider) {
         this.messenger = messenger;
         this.eventHandler = eventHandler;
-        this.conversationEngine = conversationEngine;
+        this.communicatorConfigurationProvider = communicatorConfigurationProvider;
         try {
-            FeatureConfiguration featureConfiguration = this.conversationEngine.getFeatureConfiguration();
+            FeatureConfiguration featureConfiguration = this.communicatorConfigurationProvider.getFeatureConfiguration();
 
             Greeting greeting = Greeting.create(featureConfiguration.getGreetingText(), LocalizedGreeting.create(SupportedLocale.pl_PL, featureConfiguration.getGreetingText()));
-            StartButton startButton = StartButton.create(featureConfiguration.getGreetingText());
+            StartButton startButton = StartButton.create(featureConfiguration.getInitializationPayload());
 
             messenger.updateSettings(MessengerSettings.create(of(startButton), of(greeting), empty(),
                     empty(), empty(), empty(), empty()));
@@ -106,5 +105,4 @@ public class MessengerPlatformCallbackHandler {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
-
 }

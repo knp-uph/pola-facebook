@@ -2,9 +2,6 @@ package com.adapters.outgoing.pola;
 
 import com.google.gson.annotations.SerializedName;
 
-/**
- * Created by Piotr on 12.07.2017.
- */
 public class ReportRequest {
     private String description;
     @SerializedName("product_id")

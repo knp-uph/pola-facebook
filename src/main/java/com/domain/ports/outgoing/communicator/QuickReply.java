@@ -1,4 +1,4 @@
-package com.domain.process.engine.message;
+package com.domain.ports.outgoing.communicator;
 
 public class QuickReply {
     public final String title;

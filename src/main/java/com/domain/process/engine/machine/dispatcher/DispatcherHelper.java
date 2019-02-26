@@ -1,7 +1,7 @@
 package com.domain.process.engine.machine.dispatcher;
 
+import com.domain.ports.dto.Attachment;
 import com.domain.ports.incoming.communicator.IncomingMessage;
-import com.domain.process.engine.message.attachment.Attachment;
 
 import java.util.ArrayList;
 import java.util.HashSet;

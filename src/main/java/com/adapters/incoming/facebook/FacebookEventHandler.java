@@ -1,8 +1,8 @@
 package com.adapters.incoming.facebook;
 
+import com.domain.ports.dto.UrlAttachment;
 import com.domain.ports.incoming.communicator.IncomingMessage;
 import com.domain.ports.incoming.communicator.OnNewIncomingMessageListener;
-import com.domain.process.engine.message.attachment.UrlAttachment;
 import com.github.messenger4j.Messenger;
 import com.github.messenger4j.exception.MessengerApiException;
 import com.github.messenger4j.exception.MessengerIOException;
@@ -22,11 +22,7 @@ import java.net.URL;
 import java.time.Instant;
 import java.util.List;
 
-import static com.domain.process.engine.message.attachment.Attachment.Type.IMAGE;
-
-/**
- * Created by Piotr on 23.09.2017.
- */
+import static com.domain.ports.dto.Attachment.Type.IMAGE;
 
 /**
  * This handler is responsible for the conversion of messenger4j's events to messages digestible by the engine.
@@ -59,7 +55,7 @@ public class FacebookEventHandler {
         try {
             this.messenger.send(SenderActionPayload.create(senderId, SenderAction.MARK_SEEN));
         } catch (MessengerApiException | MessengerIOException e) {
-            logger.error("MARK_SEEN could not be sent. An unexpected erroroccurred.", e);
+            logger.error("MARK_SEEN could not be sent. An unexpected error occurred.", e);
         }
     }
 

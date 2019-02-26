@@ -1,13 +1,13 @@
 package com.domain.process.engine.machine.controller;
 
 import com.domain.BotResponses;
+import com.domain.ports.outgoing.communicator.Action;
 import com.domain.ports.outgoing.communicator.OnNewOutgoingMessageListener;
+import com.domain.ports.outgoing.communicator.OutgoingMessage;
 import com.domain.ports.outgoing.context.Context;
 import com.domain.ports.outgoing.productinformation.ProductInformation;
 import com.domain.ports.outgoing.productinformation.ProductInformationService;
 import com.domain.process.engine.machine.MachineState;
-import com.domain.process.engine.message.Action;
-import com.domain.process.engine.message.OutgoingMessage;
 import com.domain.process.service.BarCodeService;
 
 import java.io.IOException;

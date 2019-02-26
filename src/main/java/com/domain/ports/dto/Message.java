@@ -1,6 +1,4 @@
-package com.domain.process.engine.message;
-
-import com.domain.process.engine.message.attachment.Attachment;
+package com.domain.ports.dto;
 
 import java.util.ArrayList;
 import java.util.List;

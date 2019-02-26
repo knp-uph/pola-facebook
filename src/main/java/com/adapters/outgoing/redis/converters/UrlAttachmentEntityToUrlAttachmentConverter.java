@@ -1,7 +1,7 @@
 package com.adapters.outgoing.redis.converters;
 
-import com.domain.process.engine.message.attachment.Attachment;
-import com.domain.process.engine.message.attachment.UrlAttachment;
+import com.domain.ports.dto.Attachment;
+import com.domain.ports.dto.UrlAttachment;
 
 import java.net.MalformedURLException;
 import java.net.URL;

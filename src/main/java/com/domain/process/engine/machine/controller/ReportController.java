@@ -1,13 +1,13 @@
 package com.domain.process.engine.machine.controller;
 
 import com.domain.BotResponses;
+import com.domain.ports.dto.Attachment;
 import com.domain.ports.outgoing.communicator.OnNewOutgoingMessageListener;
+import com.domain.ports.outgoing.communicator.OutgoingMessage;
 import com.domain.ports.outgoing.context.Context;
 import com.domain.ports.outgoing.productinformation.ProductInformationService;
 import com.domain.ports.outgoing.productinformation.ReportBuilder;
 import com.domain.process.engine.machine.MachineState;
-import com.domain.process.engine.message.OutgoingMessage;
-import com.domain.process.engine.message.attachment.Attachment;
 
 import java.io.IOException;
 

@@ -1,8 +1,8 @@
 package com.domain.ports.outgoing.context;
 
+import com.domain.ports.dto.Attachment;
 import com.domain.ports.outgoing.productinformation.ProductInformation;
 import com.domain.process.engine.machine.MachineState;
-import com.domain.process.engine.message.attachment.Attachment;
 
 import java.util.ArrayList;
 

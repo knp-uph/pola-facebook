@@ -1,6 +1,6 @@
 package com.domain.ports.incoming.communicator;
 
-import com.domain.process.engine.message.Message;
+import com.domain.ports.dto.Message;
 
 public class IncomingMessage extends Message {
     private String senderId;

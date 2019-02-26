@@ -10,15 +10,10 @@ import com.domain.process.service.BarCodeService;
 
 import java.util.HashMap;
 
-public class Flow {
+public class ConversationFlow implements MachineFlow {
     private HashMap<Transition, TransitionListener> transitions = new HashMap<>();
-    private ProductInformationService productInformationService;
-    private BarCodeService barCodeService;
 
-    public Flow(OnNewOutgoingMessageListener listener, ProductInformationService productInformationService, BarCodeService barCodeService) {
-        this.productInformationService = productInformationService;
-        this.barCodeService = barCodeService;
-
+    public ConversationFlow(OnNewOutgoingMessageListener listener, ProductInformationService productInformationService, BarCodeService barCodeService) {
         InfoController infoController = new InfoController(listener);
         ProductController productController = new ProductController(listener, barCodeService, productInformationService);
         ReportController reportController = new ReportController(listener, productInformationService);
@@ -73,13 +68,14 @@ public class Flow {
         this.addTransition(MachineState.WAIT_FOR_DECISION_OR_ACTION_2, MachineState.INVALID_INPUT_6, suggestionController::onInvalidInput1);
 
         this.addTransition(MachineState.WAIT_FOR_TEXT_2, MachineState.SAVE_SUGGESTION, suggestionController::onText);
-
     }
 
+    @Override
     public void addTransition(MachineState from, MachineState to, TransitionListener listener) {
         transitions.put(new Transition(from, to), listener);
     }
 
+    @Override
     public TransitionListener getTransition(MachineState from, MachineState to) {
         Transition wantedTransition = new Transition(from, to);
         if (transitions.containsKey(wantedTransition)) {
@@ -89,6 +85,7 @@ public class Flow {
         }
     }
 
+    @Override
     public boolean containsTransition(MachineState from, MachineState to) {
         return transitions.containsKey(new Transition(from, to));
     }

@@ -1,8 +1,8 @@
 package com.adapters.outgoing.facebook;
 
+import com.domain.ports.outgoing.communicator.Action;
 import com.domain.ports.outgoing.communicator.OnNewOutgoingMessageListener;
-import com.domain.process.engine.message.Action;
-import com.domain.process.engine.message.OutgoingMessage;
+import com.domain.ports.outgoing.communicator.OutgoingMessage;
 import com.github.messenger4j.Messenger;
 import com.github.messenger4j.exception.MessengerApiException;
 import com.github.messenger4j.exception.MessengerIOException;
@@ -27,12 +27,13 @@ import static java.util.Optional.of;
 
 public class FacebookMessageSender implements OnNewOutgoingMessageListener {
     private static final Logger logger = LoggerFactory.getLogger(FacebookMessageSender.class);
+
     private final Messenger messenger;
     private final TextSplitter splitter;
 
-    public FacebookMessageSender(Messenger messenger) {
+    public FacebookMessageSender(Messenger messenger, TextSplitter splitter) {
         this.messenger = messenger;
-        this.splitter = new TextSplitter(320);
+        this.splitter = splitter;
     }
 
     private void sendTextMessage(String recipientId, String text, List<QuickReply> quickReplies) {
@@ -70,7 +71,7 @@ public class FacebookMessageSender implements OnNewOutgoingMessageListener {
     private void sendWithQuickReplies(OutgoingMessage fromEngineMessage) {
         List<QuickReply> quickReplies = new ArrayList<>();
 
-        for (com.domain.process.engine.message.QuickReply quickReply : fromEngineMessage.getQuickReplies()) {
+        for (com.domain.ports.outgoing.communicator.QuickReply quickReply : fromEngineMessage.getQuickReplies()) {
             quickReplies.add(TextQuickReply.create(quickReply.title, quickReply.value));
         }
 
@@ -81,7 +82,7 @@ public class FacebookMessageSender implements OnNewOutgoingMessageListener {
     }
 
     private void handleSendException(Exception e) {
-        logger.error("Message could not be sent. An unexpected text occurred.", e);
+        logger.error("Message could not be sent. An unexpected error has occurred.", e);
     }
 
     @Override
@@ -105,7 +106,17 @@ public class FacebookMessageSender implements OnNewOutgoingMessageListener {
 
     private void sendAction(String recipientId, Action action) {
         try {
-            this.messenger.send(SenderActionPayload.create(recipientId, SenderAction.TYPING_ON));
+            SenderAction senderAction;
+            if (action == Action.TYPING_ON) {
+                senderAction = SenderAction.TYPING_ON;
+            } else if (action == Action.TYPING_OFF) {
+                senderAction = SenderAction.TYPING_OFF;
+            } else if (action == Action.MARK_SEEN) {
+                senderAction = SenderAction.MARK_SEEN;
+            } else {
+                throw new IllegalArgumentException("Unsupported domain send-action type: " + action.toString());
+            }
+            this.messenger.send(SenderActionPayload.create(recipientId, senderAction));
         } catch (MessengerApiException | MessengerIOException e) {
             handleSendException(e);
         }

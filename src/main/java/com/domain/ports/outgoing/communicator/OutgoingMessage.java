@@ -1,4 +1,6 @@
-package com.domain.process.engine.message;
+package com.domain.ports.outgoing.communicator;
+
+import com.domain.ports.dto.Message;
 
 import java.util.ArrayList;
 import java.util.List;

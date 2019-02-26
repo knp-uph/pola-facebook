@@ -2,9 +2,10 @@
 package com.domain.process.engine.machine.controller;
 
 import com.domain.BotResponses;
+import com.domain.ports.incoming.communicator.CommunicatorConfigurationProvider;
 import com.domain.ports.outgoing.communicator.OnNewOutgoingMessageListener;
+import com.domain.ports.outgoing.communicator.OutgoingMessage;
 import com.domain.process.engine.AbstractEngine;
-import com.domain.process.engine.message.OutgoingMessage;
 import io.sentry.Sentry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,13 +18,18 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class ControllerExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(ControllerExceptionHandler.class);
 
-    private final OnNewOutgoingMessageListener listener;
+    private final OnNewOutgoingMessageListener onNewOutgoingMessageListener;
 
-    private AbstractEngine conversationEngine;
+    private final AbstractEngine conversationEngine;
 
-    public ControllerExceptionHandler(OnNewOutgoingMessageListener listener, AbstractEngine conversationEngine) {
-        this.listener = listener;
+    private final CommunicatorConfigurationProvider communicatorConfigurationProvider;
+
+    public ControllerExceptionHandler(OnNewOutgoingMessageListener onNewOutgoingMessageListener,
+                                      AbstractEngine conversationEngine,
+                                      CommunicatorConfigurationProvider communicatorConfigurationProvider) {
+        this.onNewOutgoingMessageListener = onNewOutgoingMessageListener;
         this.conversationEngine = conversationEngine;
+        this.communicatorConfigurationProvider = communicatorConfigurationProvider;
         Sentry.init();
     }
 
@@ -40,9 +46,10 @@ public class ControllerExceptionHandler {
         String id = conversationEngine.getCurrentUserId();
 
         OutgoingMessage outgoingMessage = new OutgoingMessage(BotResponses.ControllerExceptionHandler.text, id);
-        outgoingMessage.addQuickReply(BotResponses.ControllerExceptionHandler.quickReply, conversationEngine.getFeatureConfiguration().getInitializationPayload());
+        outgoingMessage.addQuickReply(BotResponses.ControllerExceptionHandler.quickReply,
+                communicatorConfigurationProvider.getFeatureConfiguration().getInitializationPayload());
 
-        listener.onNewMessage(outgoingMessage);
+        onNewOutgoingMessageListener.onNewMessage(outgoingMessage);
         logger.debug("Error message dispatched.");
     }
 }

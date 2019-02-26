@@ -6,9 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Created by Piotr on 12.07.2017.
- */
 public class ReportRequestResponse {
     @SerializedName("signed_requests")
     private String[][] signedRequests;

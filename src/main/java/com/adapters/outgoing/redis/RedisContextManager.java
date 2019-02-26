@@ -5,9 +5,7 @@ import com.adapters.outgoing.redis.converters.ContextToRedisContextConverter;
 import com.adapters.outgoing.redis.converters.RedisContextToContextConverter;
 import com.domain.ports.outgoing.context.Context;
 import com.domain.ports.outgoing.context.ContextManager;
-import org.springframework.stereotype.Repository;
 
-@Repository
 public class RedisContextManager implements ContextManager {
 
     private final RedisRepository redisRepository;

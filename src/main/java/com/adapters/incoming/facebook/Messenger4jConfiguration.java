@@ -17,7 +17,8 @@ public class Messenger4jConfiguration {
     }
 
     @Bean
-    public FacebookEventHandler facebookEventHandler(OnNewIncomingMessageListener onNewIncomingMessageListener, Messenger messenger) {
+    public FacebookEventHandler facebookEventHandler(OnNewIncomingMessageListener onNewIncomingMessageListener,
+                                                     Messenger messenger) {
         return new FacebookEventHandler(onNewIncomingMessageListener, messenger);
     }
 

@@ -3,7 +3,7 @@ package com.adapters.outgoing.facebook;
 import java.util.LinkedList;
 import java.util.List;
 
-public class TextSplitter {
+class TextSplitter {
     private final int maxLength;
 
     public TextSplitter(int maxLength) {

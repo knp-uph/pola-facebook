@@ -7,10 +7,6 @@ import com.domain.ports.outgoing.context.Context;
 public abstract class AbstractEngine implements OnNewIncomingMessageListener {
     protected Context context;
 
-    public void setContext(Context context) {
-        this.context = context;
-    }
-
     /**
      * Prompts the conversation engine to respond to stimuli.
      *

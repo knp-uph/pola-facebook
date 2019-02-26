@@ -1,4 +1,4 @@
-package com.domain.process.engine.message.attachment;
+package com.domain.ports.dto;
 
 import java.io.IOException;
 import java.io.InputStream;

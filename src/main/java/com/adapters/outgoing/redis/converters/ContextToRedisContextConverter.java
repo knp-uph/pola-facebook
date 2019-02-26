@@ -1,8 +1,8 @@
 package com.adapters.outgoing.redis.converters;
 
+import com.domain.ports.dto.Attachment;
+import com.domain.ports.dto.UrlAttachment;
 import com.domain.ports.outgoing.context.Context;
-import com.domain.process.engine.message.attachment.Attachment;
-import com.domain.process.engine.message.attachment.UrlAttachment;
 
 public class ContextToRedisContextConverter {
 
