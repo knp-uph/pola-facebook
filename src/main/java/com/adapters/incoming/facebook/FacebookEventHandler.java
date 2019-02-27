@@ -78,7 +78,7 @@ public class FacebookEventHandler {
     public void onQuickReplyMessageEvent(QuickReplyMessageEvent event) {
         final Instant timestamp = event.timestamp();
         if (this.hasBeenServed(timestamp)) {
-            logger.debug("Discarding a duplicate event: ", event);
+            logger.debug("Discarding duplicate event: ", event);
             return;
         }
 
@@ -95,7 +95,7 @@ public class FacebookEventHandler {
     public void onAttachmentMessageEvent(AttachmentMessageEvent event) {
         final Instant timestamp = event.timestamp();
         if (this.hasBeenServed(timestamp)) {
-            logger.debug("Discarding a duplicate event: ", event);
+            logger.debug("Discarding duplicate event: ", event);
             return;
         }
 
