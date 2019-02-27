@@ -69,8 +69,7 @@ public class ReportController {
 
             listener.onNewMessage(new OutgoingMessage(BotResponses.ReportController.onSubmit.text, context.getUserId()));
         } catch (IOException e) {
-            e.printStackTrace();
-            listener.onNewMessage(new OutgoingMessage(BotResponses.ReportController.onSubmit.error, context.getUserId()));
+            throw new RuntimeException(e);
         } finally {
             context.getAttachments().clear();
         }

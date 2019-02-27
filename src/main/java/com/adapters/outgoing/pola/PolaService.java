@@ -19,16 +19,23 @@ public class PolaService implements ProductInformationService {
 
     @Override
     public ProductInformation getByCode(String code) throws IOException {
-        return polaResultToProductInformationConverter.produceProductInformation(pola.getByCode(code, ""));
+        return getByCode(code, "");
     }
 
     @Override
     public ProductInformation getByCode(String code, String deviceId) throws IOException {
-        return polaResultToProductInformationConverter.produceProductInformation(pola.getByCode(code, deviceId));
+        ProductInformation productInformation = polaResultToProductInformationConverter.produceProductInformation(pola.getByCode(code, ""));
+        /* Adapter-level implementation detail:
+        checking if description is null is one way of finding out if product information is valid.
+         */
+        if (productInformation.getDescription() == null) {
+            productInformation = null;
+        }
+        return productInformation;
     }
 
     @Override
     public ReportBuilder createReport() {
-        return null;
+        return pola.createReport();
     }
 }

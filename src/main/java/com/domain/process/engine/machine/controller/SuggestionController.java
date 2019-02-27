@@ -56,8 +56,7 @@ public class SuggestionController {
                     .send();
             listener.onNewMessage(new OutgoingMessage(BotResponses.SuggestionController.onText.text, context.getUserId()));
         } catch (IOException e) {
-            e.printStackTrace();
-            listener.onNewMessage(new OutgoingMessage(BotResponses.SuggestionController.onText.error, context.getUserId()));
+            throw new RuntimeException(e);
         }
         return MachineState.WELCOME;
     }

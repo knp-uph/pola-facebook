@@ -35,10 +35,6 @@ public class ReportRequestResponse {
         return flatArray.toArray(new String [flatArray.size()]);
     }
 
-    public void setSignedRequests(String[][] signedRequests) {
-        this.signedRequests = signedRequests;
-    }
-
     @Override
     public String toString() {
         return "ReportRequestResponse{" +

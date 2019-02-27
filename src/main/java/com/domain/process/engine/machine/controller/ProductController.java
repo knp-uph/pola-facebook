@@ -18,12 +18,12 @@ public class ProductController {
 
     private final OnNewOutgoingMessageListener listener;
     private BarCodeService barCodeService;
-    private ProductInformationService polaService;
+    private ProductInformationService productInformationService;
 
-    public ProductController(OnNewOutgoingMessageListener listener, BarCodeService barCodeService, ProductInformationService polaService) {
+    public ProductController(OnNewOutgoingMessageListener listener, BarCodeService barCodeService, ProductInformationService productInformationService) {
         this.listener = listener;
         this.barCodeService = barCodeService;
-        this.polaService = polaService;
+        this.productInformationService = productInformationService;
     }
 
     public MachineState onImage(MachineState from, MachineState to, Context context) {
@@ -77,22 +77,17 @@ public class ProductController {
         return MachineState.ASK_FOR_CHANGES_OR_ACTION;
     }
 
-    private MachineState handleDBError(Context context) {
-        listener.onNewMessage(new OutgoingMessage(BotResponses.ProductController.handleDBError.text, context.getUserId()));
-        return MachineState.WELCOME;
-    }
-
     private MachineState queryDB(String code, Context context) {
         ProductInformation productInformation;
         try {
-            productInformation = polaService.getByCode(code, "");
+            productInformation = productInformationService.getByCode(code);
         } catch (IOException e) {
-            return handleDBError(context);
+            throw new RuntimeException(e);
         }
 
         context.setProductInformation(productInformation);
 
-        if (productInformation.getDescription() != null) {
+        if (productInformation != null) {
             return MachineState.DISPLAY_RESULTS;
         } else {
             context.getAttachments().add(context.getLastAttachment());

@@ -35,7 +35,11 @@ public enum MachineState {
     INIT,
     PROCESS_CODE;
 
-    public final boolean blocking;
+    private final boolean blocking;
+
+    public boolean isBlocking() {
+        return blocking;
+    }
 
     MachineState(boolean blocking) {
         this.blocking = blocking;

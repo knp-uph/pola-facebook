@@ -95,7 +95,7 @@ public class ConversationEngine extends AbstractEngine implements CommunicatorCo
     }
 
     private void processIntermediateStates(Context context, MachineState to) {
-        while (!to.blocking) {
+        while (!to.isBlocking()) {
             MachineState currentState = context.getState();
 
             logger.debug("Process: {}  => []", currentState, to);

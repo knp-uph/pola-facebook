@@ -37,7 +37,6 @@ public class BotResponses {
 
         public static final class onText {
             public static final String text = "Dziękuję. Wysłałem sugestię.";
-            public static final String error = "Ups! Mamy usterkę, nie udało mi się wysłać sugestii. Może spróbuj później?";
         }
     }
 
@@ -74,10 +73,6 @@ public class BotResponses {
 
         public static final class onNotRecognized {
             public static final String text = "Nie udało nam się pobrać kodu z obrazka. Możesz spróbować wpisać kod ręcznie lub wysłać nowe zdjęcie, na którym lepiej widać kod kreskowy.";
-        }
-
-        public static final class handleDBError {
-            public static final String text = "Mamy usterkę i nie możemy w tym momencie uzyskać informacji na temat tego kodu. Spróbuj ponownie później. Przepraszamy!";
         }
 
         public static final class onDisplayResults {
@@ -145,7 +140,6 @@ public class BotResponses {
 
         public static final class onSubmit {
             public static final String text = "Dziękuję. Wysłałem raport. Jak mogę Ci jeszcze pomóc?";
-            public static final String error = "Ups! Mamy usterkę, nie udało mi się wysłać raportu. Może spróbuj później?";
         }
     }
 
